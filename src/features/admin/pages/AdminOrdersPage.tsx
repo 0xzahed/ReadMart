@@ -1,10 +1,10 @@
 import { CheckCircle2, Clock3, PackageCheck, Truck } from "lucide-react";
 
 const orderSummary = [
-  { label: "Processing", value: 32, icon: Clock3, color: "text-amber-600 bg-amber-100" },
-  { label: "Shipped", value: 58, icon: Truck, color: "text-sky-600 bg-sky-100" },
-  { label: "Delivered", value: 214, icon: PackageCheck, color: "text-emerald-600 bg-emerald-100" },
-  { label: "Completed", value: 198, icon: CheckCircle2, color: "text-violet-600 bg-violet-100" },
+  { label: "Processing", value: 32, icon: Clock3, color: "text-status-warning bg-status-warning-soft" },
+  { label: "Shipped", value: 58, icon: Truck, color: "text-status-info bg-status-info-soft" },
+  { label: "Delivered", value: 214, icon: PackageCheck, color: "text-status-success bg-status-success-soft" },
+  { label: "Completed", value: 198, icon: CheckCircle2, color: "text-status-complete bg-status-complete-soft" },
 ];
 
 const recentOrders = [
@@ -16,43 +16,43 @@ const recentOrders = [
 ];
 
 function badgeClass(status: string) {
-  if (status === "Processing") return "bg-amber-100 text-amber-700";
-  if (status === "Shipped") return "bg-sky-100 text-sky-700";
-  if (status === "Delivered") return "bg-emerald-100 text-emerald-700";
-  return "bg-violet-100 text-violet-700";
+  if (status === "Processing") return "bg-status-warning-soft text-status-warning";
+  if (status === "Shipped") return "bg-status-info-soft text-status-info";
+  if (status === "Delivered") return "bg-status-success-soft text-status-success";
+  return "bg-status-complete-soft text-status-complete";
 }
 
 export function AdminOrdersPage() {
   return (
     <div className="space-y-6">
-      <header className="rounded-xl border border-slate-200 bg-white p-4">
-        <h1 className="text-lg font-semibold text-slate-900">Order Management</h1>
-        <p className="text-sm text-slate-500">Track and monitor order lifecycle across the store</p>
+      <header className="rounded-xl border border-border bg-background p-4">
+        <h1 className="text-lg font-semibold text-foreground">Order Management</h1>
+        <p className="text-sm text-muted-foreground">Track and monitor order lifecycle across the store</p>
       </header>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {orderSummary.map((item) => {
           const Icon = item.icon;
           return (
-            <article key={item.label} className="rounded-xl border border-slate-200 bg-white p-4">
+            <article key={item.label} className="rounded-xl border border-border bg-background p-4">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-slate-500">{item.label}</p>
+                <p className="text-sm font-medium text-muted-foreground">{item.label}</p>
                 <span className={`rounded-md p-2 ${item.color}`}>
                   <Icon className="h-4 w-4" />
                 </span>
               </div>
-              <p className="mt-3 text-2xl font-bold text-slate-900">{item.value}</p>
+              <p className="mt-3 text-2xl font-bold text-foreground">{item.value}</p>
             </article>
           );
         })}
       </section>
 
-      <section className="rounded-xl border border-slate-200 bg-white p-4">
-        <h2 className="text-base font-semibold text-slate-900">Recent Orders</h2>
+      <section className="rounded-xl border border-border bg-background p-4">
+        <h2 className="text-base font-semibold text-foreground">Recent Orders</h2>
         <div className="mt-4 overflow-x-auto">
           <table className="w-full min-w-[700px] text-left text-sm">
             <thead>
-              <tr className="border-b border-slate-200 text-slate-500">
+              <tr className="border-b border-border text-muted-foreground">
                 <th className="pb-3 font-medium">Order ID</th>
                 <th className="pb-3 font-medium">Customer</th>
                 <th className="pb-3 font-medium">Date</th>
@@ -62,11 +62,11 @@ export function AdminOrdersPage() {
             </thead>
             <tbody>
               {recentOrders.map((order) => (
-                <tr key={order.id} className="border-b border-slate-100 last:border-b-0">
-                  <td className="py-3 font-medium text-slate-900">{order.id}</td>
-                  <td className="py-3 text-slate-600">{order.customer}</td>
-                  <td className="py-3 text-slate-600">{order.date}</td>
-                  <td className="py-3 font-medium text-slate-900">{order.total}</td>
+                <tr key={order.id} className="border-b border-border/60 last:border-b-0">
+                  <td className="py-3 font-medium text-foreground">{order.id}</td>
+                  <td className="py-3 text-muted-foreground">{order.customer}</td>
+                  <td className="py-3 text-muted-foreground">{order.date}</td>
+                  <td className="py-3 font-medium text-foreground">{order.total}</td>
                   <td className="py-3">
                     <span className={`rounded-full px-2 py-1 text-xs font-semibold ${badgeClass(order.status)}`}>
                       {order.status}

@@ -48,7 +48,7 @@ export function ProductDetailPage() {
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1">
                 {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} className={`h-4 w-4 ${i < Math.floor(product.rating) ? "fill-yellow-400 text-yellow-400" : "text-muted"}`} />
+                  <Star key={i} className={`h-4 w-4 ${i < Math.floor(product.rating) ? "fill-rating text-rating" : "text-muted"}`} />
                 ))}
               </div>
               <span className="text-sm text-muted-foreground">({product.reviews} reviews)</span>

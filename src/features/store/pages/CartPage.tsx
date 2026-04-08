@@ -82,7 +82,7 @@ export function CartPage() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Shipping</span>
-                    <span className="font-medium text-green-600">Free</span>
+                    <span className="font-medium text-status-success">Free</span>
                   </div>
                   <div className="border-t border-border pt-2 flex justify-between">
                     <span className="font-semibold text-foreground">Total</span>

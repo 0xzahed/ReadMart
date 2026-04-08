@@ -111,7 +111,7 @@ export function HomePage() {
             type="button"
             onClick={goToPrevSlide}
             aria-label="Previous slide"
-            className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg transition hover:bg-blue-700 lg:left-4"
+            className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition hover:bg-primary/90 lg:left-4"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
@@ -120,7 +120,7 @@ export function HomePage() {
             type="button"
             onClick={goToNextSlide}
             aria-label="Next slide"
-            className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg transition hover:bg-blue-700 lg:right-4"
+            className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition hover:bg-primary/90 lg:right-4"
           >
             <ChevronRight className="h-5 w-5" />
           </button>
@@ -143,7 +143,7 @@ export function HomePage() {
 
       {/* Categories */}
       <section className="container py-8">
-        <div className="rounded-2xl bg-zinc-100 px-4 py-6 sm:px-6">
+        <div className="rounded-2xl bg-secondary px-4 py-6 sm:px-6">
           <h2 className="text-center text-2xl font-extrabold tracking-wide text-foreground">
             FEATURED CATEGORIES
           </h2>
@@ -164,7 +164,7 @@ export function HomePage() {
                       to={`/explore?category=${category.id}`}
                       className="group flex flex-col items-center gap-3 px-1 text-center"
                     >
-                      <div className="h-28 w-28 overflow-hidden rounded-full border border-slate-300 bg-white shadow-sm sm:h-32 sm:w-32">
+                      <div className="h-28 w-28 overflow-hidden rounded-full border border-border bg-background shadow-sm sm:h-32 sm:w-32">
                         <img
                           src={category.image}
                           alt={category.title}
@@ -183,7 +183,7 @@ export function HomePage() {
                 type="button"
                 onClick={() => categoryApi?.scrollPrev()}
                 aria-label="Previous categories"
-                className="absolute -left-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white text-slate-900 shadow-md transition hover:bg-slate-50"
+                className="absolute -left-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-background text-foreground shadow-md transition hover:bg-secondary"
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
@@ -194,7 +194,7 @@ export function HomePage() {
                 type="button"
                 onClick={() => categoryApi?.scrollNext()}
                 aria-label="Next categories"
-                className="absolute -right-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white text-slate-900 shadow-md transition hover:bg-slate-50"
+                className="absolute -right-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-background text-foreground shadow-md transition hover:bg-secondary"
               >
                 <ChevronRight className="h-5 w-5" />
               </button>

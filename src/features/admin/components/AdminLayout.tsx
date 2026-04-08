@@ -25,22 +25,22 @@ export function AdminLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
+    <div className="min-h-screen bg-secondary/40">
+      <header className="border-b border-border bg-background">
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link to="/" className="flex items-center gap-2 font-semibold text-slate-900">
+          <Link to="/" className="flex items-center gap-2 font-semibold text-foreground">
             <Store className="h-5 w-5 text-primary" />
             ReadMart Admin
           </Link>
           <div className="flex items-center gap-3">
             <Link
               to="/"
-              className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100"
+              className="rounded-lg border border-border px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
             >
               View Storefront
             </Link>
             <button
-              className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-700"
+              className="inline-flex items-center gap-2 rounded-lg bg-foreground px-3 py-2 text-sm font-medium text-background transition-colors hover:bg-foreground/85"
               onClick={onSignOut}
             >
               <LogOut className="h-4 w-4" />
@@ -51,7 +51,7 @@ export function AdminLayout() {
       </header>
 
       <div className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[240px_1fr] lg:px-8">
-        <aside className="h-fit rounded-xl border border-slate-200 bg-white p-3">
+        <aside className="h-fit rounded-xl border border-border bg-background p-3">
           <nav className="space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -64,7 +64,7 @@ export function AdminLayout() {
                     `flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                       isActive
                         ? "bg-primary text-primary-foreground"
-                        : "text-slate-700 hover:bg-slate-100"
+                        : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                     }`
                   }
                 >

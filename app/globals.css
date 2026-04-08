@@ -29,6 +29,16 @@
   --input: #e8e8e8;
   --ring: #ff4747;
 
+  --status-success: #16a34a;
+  --status-success-soft: #dcfce7;
+  --status-warning: #d97706;
+  --status-warning-soft: #fef3c7;
+  --status-info: #0284c7;
+  --status-info-soft: #e0f2fe;
+  --status-complete: #7c3aed;
+  --status-complete-soft: #ede9fe;
+  --rating: #facc15;
+
   --radius: 0.75rem;
 
   --sidebar-background: #fafafa;
@@ -61,6 +71,15 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-status-success: var(--status-success);
+  --color-status-success-soft: var(--status-success-soft);
+  --color-status-warning: var(--status-warning);
+  --color-status-warning-soft: var(--status-warning-soft);
+  --color-status-info: var(--status-info);
+  --color-status-info-soft: var(--status-info-soft);
+  --color-status-complete: var(--status-complete);
+  --color-status-complete-soft: var(--status-complete-soft);
+  --color-rating: var(--rating);
   --color-sidebar-background: var(--sidebar-background);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -99,6 +118,16 @@
 
     --border: #2b2b2b;
     --input: #2b2b2b;
+
+    --status-success: #4ade80;
+    --status-success-soft: #14532d;
+    --status-warning: #fbbf24;
+    --status-warning-soft: #78350f;
+    --status-info: #38bdf8;
+    --status-info-soft: #0c4a6e;
+    --status-complete: #a78bfa;
+    --status-complete-soft: #4c1d95;
+    --rating: #facc15;
 
     --sidebar-background: #1a1a1a;
     --sidebar-foreground: #f5f5f5;

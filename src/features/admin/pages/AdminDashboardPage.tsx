@@ -32,10 +32,10 @@ const categorySales = [
 ];
 
 const channelShare = [
-  { name: "Organic", value: 44, color: "#ef4444" },
-  { name: "Social", value: 23, color: "#0ea5e9" },
-  { name: "Email", value: 19, color: "#22c55e" },
-  { name: "Ads", value: 14, color: "#f59e0b" },
+  { name: "Organic", value: 44, color: "var(--primary)" },
+  { name: "Social", value: 23, color: "var(--status-info)" },
+  { name: "Email", value: 19, color: "var(--status-success)" },
+  { name: "Ads", value: 14, color: "var(--status-warning)" },
 ];
 
 const stats = [
@@ -74,32 +74,32 @@ export function AdminDashboardPage() {
           return (
             <article
               key={stat.label}
-              className="rounded-xl border border-slate-200 bg-white p-4"
+              className="rounded-xl border border-border bg-background p-4"
             >
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-slate-500">{stat.label}</p>
+                <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
                 <span className="rounded-md bg-primary/10 p-2 text-primary">
                   <Icon className="h-4 w-4" />
                 </span>
               </div>
-              <p className="mt-3 text-2xl font-bold text-slate-900">{stat.value}</p>
-              <p className="mt-1 text-xs font-semibold text-emerald-600">{stat.growth}</p>
+              <p className="mt-3 text-2xl font-bold text-foreground">{stat.value}</p>
+              <p className="mt-1 text-xs font-semibold text-status-success">{stat.growth}</p>
             </article>
           );
         })}
       </section>
 
       <section className="grid gap-6 xl:grid-cols-3">
-        <article className="rounded-xl border border-slate-200 bg-white p-4 xl:col-span-2">
-          <h2 className="text-base font-semibold text-slate-900">Revenue Trend</h2>
-          <p className="text-sm text-slate-500">Last six months performance overview</p>
+        <article className="rounded-xl border border-border bg-background p-4 xl:col-span-2">
+          <h2 className="text-base font-semibold text-foreground">Revenue Trend</h2>
+          <p className="text-sm text-muted-foreground">Last six months performance overview</p>
           <div className="mt-4 h-72">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={salesByMonth}>
                 <defs>
                   <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.35} />
-                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0.02} />
+                    <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.35} />
+                    <stop offset="95%" stopColor="var(--primary)" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -115,7 +115,7 @@ export function AdminDashboardPage() {
                 <Area
                   type="monotone"
                   dataKey="sales"
-                  stroke="#ef4444"
+                  stroke="var(--primary)"
                   fillOpacity={1}
                   fill="url(#salesGradient)"
                   strokeWidth={2}
@@ -125,9 +125,9 @@ export function AdminDashboardPage() {
           </div>
         </article>
 
-        <article className="rounded-xl border border-slate-200 bg-white p-4">
-          <h2 className="text-base font-semibold text-slate-900">Traffic Sources</h2>
-          <p className="text-sm text-slate-500">Current acquisition split</p>
+        <article className="rounded-xl border border-border bg-background p-4">
+          <h2 className="text-base font-semibold text-foreground">Traffic Sources</h2>
+          <p className="text-sm text-muted-foreground">Current acquisition split</p>
           <div className="mt-4 h-72">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -158,9 +158,9 @@ export function AdminDashboardPage() {
         </article>
       </section>
 
-      <section className="rounded-xl border border-slate-200 bg-white p-4">
-        <h2 className="text-base font-semibold text-slate-900">Category Contribution</h2>
-        <p className="text-sm text-slate-500">Sales share by product category</p>
+      <section className="rounded-xl border border-border bg-background p-4">
+        <h2 className="text-base font-semibold text-foreground">Category Contribution</h2>
+        <p className="text-sm text-muted-foreground">Sales share by product category</p>
         <div className="mt-4 h-72">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={categorySales}>
@@ -174,7 +174,7 @@ export function AdminDashboardPage() {
                   return [`${safeValue}%`, "Category Share"];
                 }}
               />
-              <Bar dataKey="value" radius={[6, 6, 0, 0]} fill="#ef4444" />
+              <Bar dataKey="value" radius={[6, 6, 0, 0]} fill="var(--primary)" />
             </BarChart>
           </ResponsiveContainer>
         </div>
