@@ -4,6 +4,10 @@ import {
   Package,
   ShoppingCart,
   Store,
+  Users,
+  BarChart3,
+  Settings,
+  FileText,
 } from "lucide-react";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 
@@ -13,6 +17,10 @@ const navItems = [
   { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/admin/products", label: "Products", icon: Package },
   { to: "/admin/orders", label: "Orders", icon: ShoppingCart },
+  { to: "/admin/customers", label: "Customers", icon: Users },
+  { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
+  { to: "/admin/settings", label: "Settings", icon: Settings },
+  { to: "/admin/reports", label: "Reports", icon: FileText },
 ];
 
 export function AdminLayout() {
