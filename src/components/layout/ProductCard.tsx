@@ -14,12 +14,12 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
     <Link to={`/product/${product.id}`} className="group block h-full">
       <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
         {/* Image Container */}
-        <div className={`relative overflow-hidden bg-secondary ${compact ? "aspect-4/5" : "aspect-square lg:aspect-4/5"}`}>
+        <div className={`relative overflow-hidden bg-secondary ${compact ? "aspect-4/5" : "aspect-4/5"}`}>
           <Image
             src={product.images[0]}
             alt={product.name}
             fill
-            className={`object-cover transition-transform duration-300 group-hover:scale-105 ${compact ? "p-2" : "p-3 lg:p-4"}`}
+            className={`object-contain transition-transform duration-300 group-hover:scale-105 ${compact ? "p-2" : "p-3 lg:p-4"}`}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.style.display = "none";

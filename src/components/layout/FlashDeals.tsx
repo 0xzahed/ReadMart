@@ -33,7 +33,7 @@ export function FlashDeals() {
             <div className="mb-3 flex items-center justify-between">
               <h2 className="text-lg font-bold text-white md:text-2xl">Flash Deals</h2>
               <Link
-                to="/flash-deals"
+                to="/offers"
                 className="flex items-center gap-1 text-sm font-medium text-white/90 hover:text-white"
               >
                 See All

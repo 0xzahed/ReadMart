@@ -1,6 +1,12 @@
 "use client";
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import sneaker1 from "@/assets/products/sneaker1.png";
+import handbag1 from "@/assets/products/handbag1.png";
+import headphones1 from "@/assets/products/headphones1.png";
+import watch1 from "@/assets/products/watch1.png";
+import dress1 from "@/assets/products/dress1.png";
+import sofa1 from "@/assets/products/sofa1.png";
 
 // Types
 export interface Slider {
@@ -18,6 +24,7 @@ export interface Category {
   name: string;
   image: string;
   link?: string;
+  subcategories?: string[];
   isActive: boolean;
 }
 
@@ -28,6 +35,7 @@ export interface Product {
   originalPrice: number;
   images: string[];
   category: string;
+  subcategory?: string;
   brand?: string;
   rating: number;
   reviews: number;
@@ -152,7 +160,7 @@ const generateId = () => Math.random().toString(36).substr(2, 9);
 const sampleSliders: Slider[] = [
   {
     id: "1",
-    image: "/placeholder-slider-1.jpg",
+    image: sneaker1.src,
     title: "iPhone 16 Pro",
     subtitle: "Extraordinary Visual & Exceptional Power",
     buttonText: "Shop Now",
@@ -162,13 +170,139 @@ const sampleSliders: Slider[] = [
 ];
 
 const sampleCategories: Category[] = [
-  { id: "1", name: "Mobile", image: "/placeholder-cat-mobile.jpg", isActive: true },
-  { id: "2", name: "Headphone", image: "/placeholder-cat-headphone.jpg", isActive: true },
-  { id: "3", name: "Tablets", image: "/placeholder-cat-tablets.jpg", isActive: true },
-  { id: "4", name: "Laptop", image: "/placeholder-cat-laptop.jpg", isActive: true },
-  { id: "5", name: "Speakers", image: "/placeholder-cat-speakers.jpg", isActive: true },
-  { id: "6", name: "Smart Watch", image: "/placeholder-cat-watch.jpg", isActive: true },
+  {
+    id: "1",
+    name: "Mobile",
+    image: sneaker1.src,
+    link: "/categories/1",
+    subcategories: ["Flagship", "Budget", "Accessories"],
+    isActive: true,
+  },
+  {
+    id: "2",
+    name: "Headphone",
+    image: headphones1.src,
+    link: "/categories/2",
+    subcategories: ["Wireless", "Gaming", "Studio"],
+    isActive: true,
+  },
+  {
+    id: "3",
+    name: "Tablets",
+    image: dress1.src,
+    link: "/categories/3",
+    subcategories: ["Android", "iPad", "Accessories"],
+    isActive: true,
+  },
+  {
+    id: "4",
+    name: "Laptop",
+    image: watch1.src,
+    link: "/categories/4",
+    subcategories: ["Ultrabook", "Gaming", "Workstation"],
+    isActive: true,
+  },
+  {
+    id: "5",
+    name: "Speakers",
+    image: handbag1.src,
+    link: "/categories/5",
+    subcategories: ["Bluetooth", "Home Theater", "Portable"],
+    isActive: true,
+  },
+  {
+    id: "6",
+    name: "Smart Watch",
+    image: sofa1.src,
+    link: "/categories/6",
+    subcategories: ["Fitness", "Luxury", "Kids"],
+    isActive: true,
+  },
 ];
+
+const defaultSliderImagesById: Record<string, string> = {
+  "1": sneaker1.src,
+};
+
+const defaultCategoryImagesById: Record<string, string> = {
+  "1": sneaker1.src,
+  "2": headphones1.src,
+  "3": dress1.src,
+  "4": watch1.src,
+  "5": handbag1.src,
+  "6": sofa1.src,
+};
+
+const defaultProductImagesById: Record<string, string[]> = {
+  "1": [sneaker1.src],
+  "2": [handbag1.src],
+  "3": [headphones1.src],
+  "4": [watch1.src],
+  "5": [dress1.src],
+  "6": [sofa1.src],
+};
+
+const isPlaceholderImage = (image: string) => {
+  return (
+    image.includes("placehold.co") ||
+    image.includes("placeholder-product") ||
+    image.includes("placeholder-cat") ||
+    image.includes("placeholder-slider")
+  );
+};
+
+const normalizeSlidersWithImages = (input: Slider[]): Slider[] => {
+  return input.map((slider) => {
+    const fallback = defaultSliderImagesById[slider.id] || sneaker1.src;
+    const image = !slider.image || isPlaceholderImage(slider.image) ? fallback : slider.image;
+
+    return {
+      ...slider,
+      image,
+      buttonText: slider.buttonText || "Shop Now",
+      buttonLink: slider.buttonLink || "/",
+    };
+  });
+};
+
+const normalizeCategoriesWithImages = (input: Category[]): Category[] => {
+  return input.map((category) => {
+    const fallback = defaultCategoryImagesById[category.id] || sneaker1.src;
+    const image = !category.image || isPlaceholderImage(category.image) ? fallback : category.image;
+    const normalizedSubcategories = Array.isArray(category.subcategories)
+      ? category.subcategories
+          .map((subcategory) => (typeof subcategory === "string" ? subcategory.trim() : ""))
+          .filter(Boolean)
+      : [];
+
+    return {
+      ...category,
+      image,
+      link: category.link || `/categories/${category.id}`,
+      subcategories: normalizedSubcategories,
+    };
+  });
+};
+
+const normalizeProductsWithImages = (products: Product[]): Product[] => {
+  return products.map((product) => {
+    const currentImages = Array.isArray(product.images)
+      ? product.images.filter((image) => typeof image === "string" && image.trim().length > 0)
+      : [];
+
+    const fallbackImages = defaultProductImagesById[product.id];
+
+    if (!fallbackImages) {
+      return { ...product, images: currentImages };
+    }
+
+    if (currentImages.length === 0 || currentImages.every(isPlaceholderImage)) {
+      return { ...product, images: fallbackImages };
+    }
+
+    return { ...product, images: currentImages };
+  });
+};
 
 const sampleProducts: Product[] = [
   {
@@ -176,13 +310,15 @@ const sampleProducts: Product[] = [
     name: "iPhone 16 Pro Max",
     price: 1399.99,
     originalPrice: 1499.99,
-    images: ["/placeholder-product-1.jpg"],
+    images: defaultProductImagesById["1"],
     category: "1",
+    subcategory: "Flagship",
     brand: "Apple",
     rating: 4.8,
     reviews: 234,
     description: "The ultimate iPhone experience with advanced camera system and A18 Pro chip.",
     colors: ["Desert Titanium", "Natural Titanium", "White Titanium", "Black Titanium"],
+    barcode: "890100000001",
     inStock: true,
     isFlashDeal: true,
     discountPercent: 7,
@@ -192,13 +328,15 @@ const sampleProducts: Product[] = [
     name: "Samsung Galaxy S24 Ultra",
     price: 1199.99,
     originalPrice: 1299.99,
-    images: ["/placeholder-product-2.jpg"],
+    images: defaultProductImagesById["2"],
     category: "1",
+    subcategory: "Flagship",
     brand: "Samsung",
     rating: 4.7,
     reviews: 189,
     description: "Premium Android smartphone with S Pen and AI features.",
     colors: ["Titanium Gray", "Titanium Black", "Titanium Violet", "Titanium Yellow"],
+    barcode: "890100000002",
     inStock: true,
     isFlashDeal: true,
     discountPercent: 8,
@@ -208,16 +346,72 @@ const sampleProducts: Product[] = [
     name: "Sony WH-1000XM5",
     price: 349.99,
     originalPrice: 399.99,
-    images: ["/placeholder-product-3.jpg"],
+    images: defaultProductImagesById["3"],
     category: "2",
+    subcategory: "Wireless",
     brand: "Sony",
     rating: 4.9,
     reviews: 567,
     description: "Industry-leading noise cancellation with exceptional sound quality.",
     colors: ["Black", "Silver", "Midnight Blue"],
+    barcode: "890100000003",
     inStock: true,
     isFlashDeal: true,
     discountPercent: 12,
+  },
+  {
+    id: "4",
+    name: "MacBook Pro 16",
+    price: 2499.99,
+    originalPrice: 2699.99,
+    images: defaultProductImagesById["4"],
+    category: "4",
+    subcategory: "Workstation",
+    brand: "Apple",
+    rating: 4.9,
+    reviews: 342,
+    description: "Powerful laptop with M3 Pro chip and stunning Retina display.",
+    colors: ["Space Gray", "Silver"],
+    barcode: "890100000004",
+    inStock: true,
+    isFlashDeal: false,
+    discountPercent: 7,
+  },
+  {
+    id: "5",
+    name: "iPad Air M2",
+    price: 799.99,
+    originalPrice: 899.99,
+    images: defaultProductImagesById["5"],
+    category: "3",
+    subcategory: "iPad",
+    brand: "Apple",
+    rating: 4.8,
+    reviews: 156,
+    description: "Versatile tablet with M2 chip and Apple Pencil Pro support.",
+    colors: ["Space Gray", "Starlight", "Purple", "Blue"],
+    barcode: "890100000005",
+    inStock: true,
+    isFlashDeal: true,
+    discountPercent: 11,
+  },
+  {
+    id: "6",
+    name: "AirPods Pro 2",
+    price: 249.99,
+    originalPrice: 279.99,
+    images: defaultProductImagesById["6"],
+    category: "2",
+    subcategory: "Wireless",
+    brand: "Apple",
+    rating: 4.7,
+    reviews: 892,
+    description: "Active noise cancellation with adaptive audio.",
+    colors: ["White"],
+    barcode: "890100000006",
+    inStock: true,
+    isFlashDeal: true,
+    discountPercent: 10,
   },
 ];
 
@@ -237,25 +431,52 @@ export const StoreProvider = ({ children }: { children: ReactNode }) => {
   const [sliders, setSliders] = useState<Slider[]>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("readmart_sliders");
-      return saved ? JSON.parse(saved) : sampleSliders;
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) {
+            return normalizeSlidersWithImages(parsed as Slider[]);
+          }
+        } catch {
+          // Fall back to sample data when saved data is malformed.
+        }
+      }
     }
-    return sampleSliders;
+    return normalizeSlidersWithImages(sampleSliders);
   });
 
   const [categories, setCategories] = useState<Category[]>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("readmart_categories");
-      return saved ? JSON.parse(saved) : sampleCategories;
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) {
+            return normalizeCategoriesWithImages(parsed as Category[]);
+          }
+        } catch {
+          // Fall back to sample data when saved data is malformed.
+        }
+      }
     }
-    return sampleCategories;
+    return normalizeCategoriesWithImages(sampleCategories);
   });
 
   const [products, setProducts] = useState<Product[]>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("readmart_products");
-      return saved ? JSON.parse(saved) : sampleProducts;
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) {
+            return normalizeProductsWithImages(parsed as Product[]);
+          }
+        } catch {
+          // Fall back to sample data when saved data is malformed.
+        }
+      }
     }
-    return sampleProducts;
+    return normalizeProductsWithImages(sampleProducts);
   });
 
   const [flashDeal, setFlashDeal] = useState<FlashDeal | null>(() => {
@@ -377,7 +598,12 @@ export const StoreProvider = ({ children }: { children: ReactNode }) => {
 
   // Slider functions
   const addSlider = (slider: Omit<Slider, "id">) => {
-    const newSlider = { ...slider, id: generateId() };
+    const newSlider = {
+      ...slider,
+      id: generateId(),
+      buttonText: slider.buttonText || "Shop Now",
+      image: slider.image || sneaker1.src,
+    };
     setSliders((prev) => [...prev, newSlider]);
   };
 
@@ -391,12 +617,36 @@ export const StoreProvider = ({ children }: { children: ReactNode }) => {
 
   // Category functions
   const addCategory = (category: Omit<Category, "id">) => {
-    const newCategory = { ...category, id: generateId() };
+    const id = generateId();
+    const sanitizedSubcategories = Array.isArray(category.subcategories)
+      ? category.subcategories.map((subcategory) => subcategory.trim()).filter(Boolean)
+      : [];
+    const newCategory = {
+      ...category,
+      id,
+      link: category.link || `/categories/${id}`,
+      subcategories: sanitizedSubcategories,
+    };
     setCategories((prev) => [...prev, newCategory]);
   };
 
   const updateCategory = (id: string, category: Partial<Category>) => {
-    setCategories((prev) => prev.map((c) => (c.id === id ? { ...c, ...category } : c)));
+    const sanitizedSubcategories = Array.isArray(category.subcategories)
+      ? category.subcategories.map((subcategory) => subcategory.trim()).filter(Boolean)
+      : undefined;
+
+    setCategories((prev) =>
+      prev.map((c) =>
+        c.id === id
+          ? {
+              ...c,
+              ...category,
+              link: category.link || c.link || `/categories/${id}`,
+              subcategories: sanitizedSubcategories ?? c.subcategories ?? [],
+            }
+          : c
+      )
+    );
   };
 
   const deleteCategory = (id: string) => {

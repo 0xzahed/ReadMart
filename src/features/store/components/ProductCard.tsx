@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Product } from "@/data/products";
@@ -17,10 +18,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 {product.badge}
               </span>
             )}
-            <img
+            <Image
               src={product.image}
               alt={product.name}
-              loading="lazy"
               width={512}
               height={512}
               className="aspect-4/5 w-full object-contain p-4 transition-transform duration-300 group-hover:scale-105 lg:aspect-square lg:p-5"

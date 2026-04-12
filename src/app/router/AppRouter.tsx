@@ -1,20 +1,22 @@
 import { Navigate, RouterProvider, createBrowserRouter, Outlet } from "react-router-dom";
 
 import { StoreLayout } from "@/app/layouts/StoreLayout";
-import { AdminDashboardPage } from "@/features/admin/pages/AdminDashboardPage";
-import { AdminLoginPage } from "@/features/admin/pages/AdminLoginPage";
-import { CartPage } from "@/features/store/pages/CartPage";
-import { ExplorePage } from "@/features/store/pages/ExplorePage";
-import { HomePage } from "@/features/store/pages/HomePage";
-import { ProductDetailPage } from "@/features/store/pages/ProductDetailPage";
-import { WishlistPage } from "@/features/store/pages/WishlistPage";
-import { SearchPage } from "@/features/store/pages/SearchPage";
-import { OrderConfirmationPage } from "@/features/store/pages/OrderConfirmationPage";
-import { OrdersPage } from "@/features/store/pages/OrdersPage";
-import { ScanPage } from "@/features/store/pages/ScanPage";
-import { ChatPage } from "@/features/store/pages/ChatPage";
-import { OffersPage } from "@/features/store/pages/OffersPage";
-import { MorePage } from "@/features/store/pages/MorePage";
+import { AdminDashboardPage } from "@/features/admin/modules/dashboard/AdminDashboardPage";
+import { AdminLoginPage } from "@/features/admin/modules/auth/AdminLoginPage";
+import { CartPage } from "@/features/store/modules/cart/CartPage";
+import { ExplorePage } from "@/features/store/modules/catalog/ExplorePage";
+import { HomePage } from "@/features/store/modules/home/HomePage";
+import { ProductDetailPage } from "@/features/store/modules/catalog/ProductDetailPage";
+import { WishlistPage } from "@/features/store/modules/wishlist/WishlistPage";
+import { SearchPage } from "@/features/store/modules/catalog/SearchPage";
+import { CategoriesPage } from "@/features/store/modules/catalog/CategoriesPage";
+import { CategoryProductsPage } from "@/features/store/modules/catalog/CategoryProductsPage";
+import { OrderConfirmationPage } from "@/features/store/modules/orders/OrderConfirmationPage";
+import { OrdersPage } from "@/features/store/modules/orders/OrdersPage";
+import { ScanPage } from "@/features/store/modules/scan/ScanPage";
+import { ChatPage } from "@/features/store/modules/chat/ChatPage";
+import { OffersPage } from "@/features/store/modules/offers/OffersPage";
+import { MorePage } from "@/features/store/modules/more/MorePage";
 import { NotFoundPage } from "@/shared/pages/NotFoundPage";
 
 const router = createBrowserRouter([
@@ -28,6 +30,8 @@ const router = createBrowserRouter([
       { path: "cart", element: <CartPage /> },
       { path: "wishlist", element: <WishlistPage /> },
       { path: "search", element: <SearchPage /> },
+      { path: "categories", element: <CategoriesPage /> },
+      { path: "categories/:id", element: <CategoryProductsPage /> },
       { path: "order-confirmation", element: <OrderConfirmationPage /> },
       { path: "orders", element: <OrdersPage /> },
       { path: "scan", element: <ScanPage /> },

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Search, Bell, ShoppingCart, Image as ImageIcon } from "lucide-react";
+import { Search, Bell, ShoppingCart } from "lucide-react";
 import { useStore } from "@/contexts/StoreContext";
 
 interface MobileHeaderProps {
@@ -10,7 +10,13 @@ interface MobileHeaderProps {
 }
 
 export function MobileHeader({ onSearch }: MobileHeaderProps) {
-  const { cart, unreadNotificationCount } = useStore();
+  const {
+    cart,
+    notifications,
+    unreadNotificationCount,
+    markNotificationAsRead,
+    markAllNotificationsAsRead,
+  } = useStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
 
@@ -33,14 +39,8 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
               placeholder="Search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-10 py-2.5 rounded-full bg-secondary text-foreground placeholder:text-muted-foreground border-0 focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full pl-10 pr-4 py-2.5 rounded-full bg-secondary text-foreground placeholder:text-muted-foreground border-0 focus:outline-none focus:ring-2 focus:ring-primary"
             />
-            <button
-              type="button"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-            >
-              <ImageIcon className="w-5 h-5" />
-            </button>
           </div>
         </form>
 
@@ -61,15 +61,32 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
           {/* Notifications Dropdown */}
           {showNotifications && (
             <div className="absolute right-0 top-full mt-2 w-80 bg-card rounded-lg shadow-lg border border-border overflow-hidden z-50">
-              <div className="p-3 border-b border-border">
+              <div className="flex items-center justify-between p-3 border-b border-border">
                 <h3 className="font-semibold text-foreground">Notifications</h3>
+                {unreadNotificationCount > 0 && (
+                  <button
+                    onClick={markAllNotificationsAsRead}
+                    className="text-xs font-medium text-primary hover:text-primary/80"
+                  >
+                    Mark all read
+                  </button>
+                )}
               </div>
               <div className="max-h-80 overflow-y-auto">
-                {/* Placeholder notifications */}
-                <div className="p-3 hover:bg-secondary/50 cursor-pointer">
-                  <p className="text-sm font-medium text-foreground">Welcome to ReadMart!</p>
-                  <p className="text-xs text-muted-foreground">Start shopping amazing deals</p>
-                </div>
+                {notifications.length === 0 ? (
+                  <div className="p-3 text-sm text-muted-foreground">No notifications yet</div>
+                ) : (
+                  notifications.slice(0, 8).map((notification) => (
+                    <button
+                      key={notification.id}
+                      onClick={() => markNotificationAsRead(notification.id)}
+                      className="w-full p-3 hover:bg-secondary/50 text-left"
+                    >
+                      <p className="text-sm font-medium text-foreground">{notification.title}</p>
+                      <p className="text-xs text-muted-foreground">{notification.message}</p>
+                    </button>
+                  ))
+                )}
               </div>
             </div>
           )}
@@ -128,14 +145,32 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
 
             {showNotifications && (
               <div className="absolute right-0 top-full z-50 mt-2 w-80 overflow-hidden rounded-lg border border-border bg-card shadow-lg">
-                <div className="border-b border-border p-3">
+                <div className="flex items-center justify-between border-b border-border p-3">
                   <h3 className="font-semibold text-foreground">Notifications</h3>
+                  {unreadNotificationCount > 0 && (
+                    <button
+                      onClick={markAllNotificationsAsRead}
+                      className="text-xs font-medium text-primary hover:text-primary/80"
+                    >
+                      Mark all read
+                    </button>
+                  )}
                 </div>
                 <div className="max-h-80 overflow-y-auto">
-                  <div className="cursor-pointer p-3 hover:bg-secondary/50">
-                    <p className="text-sm font-medium text-foreground">Welcome to ReadMart!</p>
-                    <p className="text-xs text-muted-foreground">Start shopping amazing deals</p>
-                  </div>
+                  {notifications.length === 0 ? (
+                    <div className="p-3 text-sm text-muted-foreground">No notifications yet</div>
+                  ) : (
+                    notifications.slice(0, 8).map((notification) => (
+                      <button
+                        key={notification.id}
+                        onClick={() => markNotificationAsRead(notification.id)}
+                        className="w-full cursor-pointer p-3 hover:bg-secondary/50 text-left"
+                      >
+                        <p className="text-sm font-medium text-foreground">{notification.title}</p>
+                        <p className="text-xs text-muted-foreground">{notification.message}</p>
+                      </button>
+                    ))
+                  )}
                 </div>
               </div>
             )}

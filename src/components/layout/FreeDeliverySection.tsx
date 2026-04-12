@@ -19,7 +19,7 @@ export function FreeDeliverySection() {
               </div>
             </div>
             <Link
-              to="/free-delivery"
+              to="/offers"
               className="flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80"
             >
               View All

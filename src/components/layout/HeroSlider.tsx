@@ -35,8 +35,8 @@ export function HeroSlider() {
   return (
     <section className="relative w-full overflow-hidden pt-3 md:pt-4 lg:pt-6">
       {/* Slider Container */}
-      <div className="mx-auto w-full max-w-330 px-4 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-2xl border border-border/40 shadow-sm lg:rounded-[28px]">
+      <div className="mx-auto w-full max-w-480 px-0 sm:px-4 lg:px-8">
+        <div className="relative overflow-hidden border border-border/40 shadow-sm sm:rounded-2xl lg:rounded-[28px]">
         <div
           className="flex transition-transform duration-500 ease-in-out"
           style={{ transform: `translateX(-${currentIndex * 100}%)` }}
@@ -44,7 +44,7 @@ export function HeroSlider() {
           {activeSliders.map((slider) => (
             <div key={slider.id} className="relative w-full shrink-0">
               {/* Image */}
-              <div className="relative h-55 w-full bg-secondary sm:h-70 lg:h-95 xl:h-107.5">
+              <div className="relative aspect-video w-full bg-secondary">
                 <Image
                   src={slider.image}
                   alt={slider.title}
