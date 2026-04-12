@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
+import { StoreProvider } from "@/contexts/StoreContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { CartProvider } from "@/contexts/CartContext";
 
@@ -18,11 +19,13 @@ export function AppProviders({ children }: AppProvidersProps) {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <AdminAuthProvider>
-          <CartProvider>
-            <Toaster />
-            <Sonner />
-            {children}
-          </CartProvider>
+          <StoreProvider>
+            <CartProvider>
+              <Toaster />
+              <Sonner />
+              {children}
+            </CartProvider>
+          </StoreProvider>
         </AdminAuthProvider>
       </TooltipProvider>
     </QueryClientProvider>

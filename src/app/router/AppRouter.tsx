@@ -1,33 +1,39 @@
-import { Navigate, RouterProvider, createBrowserRouter } from "react-router-dom";
+import { Navigate, RouterProvider, createBrowserRouter, Outlet } from "react-router-dom";
 
 import { StoreLayout } from "@/app/layouts/StoreLayout";
-import { AdminLayout } from "@/features/admin/components/AdminLayout";
-import { RequireAdmin } from "@/features/admin/components/RequireAdmin";
 import { AdminDashboardPage } from "@/features/admin/pages/AdminDashboardPage";
 import { AdminLoginPage } from "@/features/admin/pages/AdminLoginPage";
-import { AdminOrdersPage } from "@/features/admin/pages/AdminOrdersPage";
-import { AdminProductsPage } from "@/features/admin/pages/AdminProductsPage";
-import { AdminCustomersPage } from "@/features/admin/pages/AdminCustomersPage";
-import { AdminAnalyticsPage } from "@/features/admin/pages/AdminAnalyticsPage";
-import { AdminSettingsPage } from "@/features/admin/pages/AdminSettingsPage";
-import { AdminReportsPage } from "@/features/admin/pages/AdminReportsPage";
 import { CartPage } from "@/features/store/pages/CartPage";
 import { ExplorePage } from "@/features/store/pages/ExplorePage";
 import { HomePage } from "@/features/store/pages/HomePage";
 import { ProductDetailPage } from "@/features/store/pages/ProductDetailPage";
 import { WishlistPage } from "@/features/store/pages/WishlistPage";
+import { SearchPage } from "@/features/store/pages/SearchPage";
+import { OrderConfirmationPage } from "@/features/store/pages/OrderConfirmationPage";
+import { OrdersPage } from "@/features/store/pages/OrdersPage";
+import { ScanPage } from "@/features/store/pages/ScanPage";
+import { ChatPage } from "@/features/store/pages/ChatPage";
+import { OffersPage } from "@/features/store/pages/OffersPage";
+import { MorePage } from "@/features/store/pages/MorePage";
 import { NotFoundPage } from "@/shared/pages/NotFoundPage";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <StoreLayout />,
+    element: <StoreLayout><Outlet /></StoreLayout>,
     children: [
       { index: true, element: <HomePage /> },
       { path: "explore", element: <ExplorePage /> },
       { path: "product/:id", element: <ProductDetailPage /> },
       { path: "cart", element: <CartPage /> },
       { path: "wishlist", element: <WishlistPage /> },
+      { path: "search", element: <SearchPage /> },
+      { path: "order-confirmation", element: <OrderConfirmationPage /> },
+      { path: "orders", element: <OrdersPage /> },
+      { path: "scan", element: <ScanPage /> },
+      { path: "chat", element: <ChatPage /> },
+      { path: "offers", element: <OffersPage /> },
+      { path: "more", element: <MorePage /> },
     ],
   },
   {
@@ -35,69 +41,8 @@ const router = createBrowserRouter([
     element: <AdminLoginPage />,
   },
   {
-    path: "/admin/dashboard",
-    element: (
-      <RequireAdmin>
-        <AdminLayout />
-      </RequireAdmin>
-    ),
-    children: [
-      { index: true, element: <AdminDashboardPage /> },
-    ],
-  },
-  {
-    path: "/admin/products",
-    element: (
-      <RequireAdmin>
-        <AdminLayout />
-      </RequireAdmin>
-    ),
-    children: [{ index: true, element: <AdminProductsPage /> }],
-  },
-  {
-    path: "/admin/orders",
-    element: (
-      <RequireAdmin>
-        <AdminLayout />
-      </RequireAdmin>
-    ),
-    children: [{ index: true, element: <AdminOrdersPage /> }],
-  },
-  {
-    path: "/admin/customers",
-    element: (
-      <RequireAdmin>
-        <AdminLayout />
-      </RequireAdmin>
-    ),
-    children: [{ index: true, element: <AdminCustomersPage /> }],
-  },
-  {
-    path: "/admin/analytics",
-    element: (
-      <RequireAdmin>
-        <AdminLayout />
-      </RequireAdmin>
-    ),
-    children: [{ index: true, element: <AdminAnalyticsPage /> }],
-  },
-  {
-    path: "/admin/settings",
-    element: (
-      <RequireAdmin>
-        <AdminLayout />
-      </RequireAdmin>
-    ),
-    children: [{ index: true, element: <AdminSettingsPage /> }],
-  },
-  {
-    path: "/admin/reports",
-    element: (
-      <RequireAdmin>
-        <AdminLayout />
-      </RequireAdmin>
-    ),
-    children: [{ index: true, element: <AdminReportsPage /> }],
+    path: "/admin/*",
+    element: <AdminDashboardPage />,
   },
   {
     path: "/auth/signin",

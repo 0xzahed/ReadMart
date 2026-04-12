@@ -1,151 +1,271 @@
-import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Heart, ShoppingCart, Star, Minus, Plus } from "lucide-react";
+"use client";
+
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { products } from "@/data/products";
-import { useCart } from "@/contexts/CartContext";
-import ProductCard from "@/features/store/components/ProductCard";
+import Image from "next/image";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import {
+  ArrowLeft,
+  Heart,
+  Share2,
+  ShoppingCart,
+  Minus,
+  Plus,
+  MessageCircle,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
+import { useStore } from "@/contexts/StoreContext";
+import { ProductCard } from "@/components/layout/ProductCard";
 
 export function ProductDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { addToCart, toggleWishlist, isInWishlist } = useCart();
+  const { products, addToCart, getCartCount } = useStore();
+
   const product = products.find((p) => p.id === id);
+  const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [selectedColor, setSelectedColor] = useState(product?.colors?.[0]);
-  const [selectedSize, setSelectedSize] = useState(product?.sizes?.[0]);
+  const [selectedColor, setSelectedColor] = useState(product?.colors[0] || "");
+  const [showAllColors, setShowAllColors] = useState(false);
+  const [showShare, setShowShare] = useState(false);
 
-  if (!product) return <div className="flex h-screen items-center justify-center text-muted-foreground">Product not found</div>;
+  if (!product) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground mb-4">Product not found</p>
+          <Link to="/" className="text-primary hover:underline">
+            Go Home
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
-  const related = products.filter((p) => p.category === product.category && p.id !== product.id);
-  const wishlisted = isInWishlist(product.id);
+  const relatedProducts = products.filter(
+    (p) => p.category === product.category && p.id !== product.id
+  );
+
+  const handleAddToCart = () => {
+    addToCart(product.id, quantity, selectedColor);
+    // Show success notification
+  };
+
+  const handleBuyNow = () => {
+    handleAddToCart();
+    navigate("/cart");
+  };
+
+  const handleWhatsAppShare = () => {
+    const text = `Check out this product: ${product.name} - $${product.price}\n${window.location.href}`;
+    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(url, "_blank");
+  };
+
+  const incrementQuantity = () => setQuantity((prev) => prev + 1);
+  const decrementQuantity = () => setQuantity((prev) => Math.max(1, prev - 1));
+
+  const visibleColors = showAllColors ? product.colors : product.colors.slice(0, 4);
+  const hasMoreColors = product.colors.length > 4;
 
   return (
-    <div className="pb-24 lg:pb-8">
-      {/* Mobile back */}
-      <div className="sticky top-0 z-40 flex items-center gap-3 border-b border-border bg-background px-4 py-3 lg:hidden">
-        <button onClick={() => navigate(-1)}>
-          <ArrowLeft className="h-5 w-5" />
-        </button>
-        <h1 className="text-sm font-semibold">Product Details</h1>
+    <div className="min-h-screen bg-background pb-32">
+      {/* Top Navigation */}
+      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur border-b border-border">
+        <div className="flex items-center justify-between px-4 py-3">
+          <button
+            onClick={() => navigate(-1)}
+            className="p-2 hover:bg-secondary rounded-full transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowShare(!showShare)}
+              className="p-2 hover:bg-secondary rounded-full transition-colors"
+            >
+              <Share2 className="w-5 h-5" />
+            </button>
+            <button className="p-2 hover:bg-secondary rounded-full transition-colors">
+              <Heart className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div className="container lg:py-8">
-        <div className="flex flex-col gap-8 lg:flex-row">
-          {/* Image */}
-          <div className="flex-1">
-            <div className="rounded-2xl bg-secondary p-8">
-              <img src={product.image} alt={product.name} className="mx-auto max-h-[400px] object-contain" />
-            </div>
-          </div>
+      {/* Share Dropdown */}
+      {showShare && (
+        <div className="absolute top-16 right-4 bg-card rounded-lg shadow-lg border border-border p-2 z-50">
+          <button
+            onClick={handleWhatsAppShare}
+            className="flex items-center gap-2 px-3 py-2 hover:bg-secondary rounded text-sm w-full"
+          >
+            <MessageCircle className="w-4 h-4 text-whatsapp" />
+            Share on WhatsApp
+          </button>
+        </div>
+      )}
 
-          {/* Info */}
-          <div className="flex-1 space-y-5 px-4 lg:px-0">
-            {product.badge && (
-              <span className="inline-block rounded-md bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">{product.badge}</span>
-            )}
-            <h1 className="text-2xl font-bold text-foreground">{product.name}</h1>
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} className={`h-4 w-4 ${i < Math.floor(product.rating) ? "fill-rating text-rating" : "text-muted"}`} />
-                ))}
-              </div>
-              <span className="text-sm text-muted-foreground">({product.reviews} reviews)</span>
-            </div>
+      {/* Product Images */}
+      <div className="relative aspect-square bg-secondary">
+        <Image
+          src={product.images[selectedImage]}
+          alt={product.name}
+          fill
+          className="object-cover"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.style.display = "none";
+          }}
+        />
+      </div>
 
-            <div className="flex items-baseline gap-3">
-              <span className="text-2xl font-bold text-primary">${product.price}</span>
-              {product.originalPrice && (
-                <span className="text-lg text-muted-foreground line-through">${product.originalPrice}</span>
-              )}
-            </div>
+      {/* Thumbnail Images */}
+      {product.images.length > 1 && (
+        <div className="flex gap-2 px-4 py-3 overflow-x-auto">
+          {product.images.map((image, index) => (
+            <button
+              key={index}
+              onClick={() => setSelectedImage(index)}
+              className={`relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden border-2 ${
+                selectedImage === index ? "border-primary" : "border-transparent"
+              }`}
+            >
+              <Image src={image} alt="" fill className="object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
 
-            <p className="text-sm leading-relaxed text-muted-foreground">{product.description}</p>
+      {/* Product Info */}
+      <div className="px-4 py-4">
+        {/* Brand Name (Optional) */}
+        {product.brand && (
+          <p className="text-sm text-muted-foreground mb-1">{product.brand}</p>
+        )}
 
-            {/* Colors */}
-            {product.colors && (
-              <div>
-                <h3 className="text-sm font-semibold text-foreground mb-2">Color</h3>
-                <div className="flex gap-2">
-                  {product.colors.map((c) => (
-                    <button
-                      key={c}
-                      onClick={() => setSelectedColor(c)}
-                      className={`h-8 w-8 rounded-full border-2 transition-all ${selectedColor === c ? "border-primary scale-110" : "border-border"}`}
-                      style={{ backgroundColor: c }}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
+        {/* Product Name */}
+        <h1 className="text-xl font-bold text-foreground mb-3">{product.name}</h1>
 
-            {/* Sizes */}
-            {product.sizes && (
-              <div>
-                <h3 className="text-sm font-semibold text-foreground mb-2">Size</h3>
-                <div className="flex flex-wrap gap-2">
-                  {product.sizes.map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => setSelectedSize(s)}
-                      className={`rounded-lg border px-4 py-2 text-sm font-medium transition-all ${
-                        selectedSize === s
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : "border-border text-foreground hover:border-primary"
-                      }`}
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+        {/* Price Section */}
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-2xl font-bold text-price-original">
+            ${product.price.toFixed(2)}
+          </span>
+          {product.originalPrice > product.price && (
+            <span className="text-base text-price-discounted line-through">
+              ${product.originalPrice.toFixed(2)}
+            </span>
+          )}
+        </div>
 
-            {/* Quantity */}
-            <div>
-              <h3 className="text-sm font-semibold text-foreground mb-2">Quantity</h3>
-              <div className="flex items-center gap-3">
-                <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="flex h-10 w-10 items-center justify-center rounded-lg border border-border">
-                  <Minus className="h-4 w-4" />
-                </button>
-                <span className="w-8 text-center font-semibold">{quantity}</span>
-                <button onClick={() => setQuantity(quantity + 1)} className="flex h-10 w-10 items-center justify-center rounded-lg border border-border">
-                  <Plus className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="flex gap-3 pt-2">
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-12 w-12 shrink-0"
-                onClick={() => toggleWishlist(product)}
-              >
-                <Heart className={`h-5 w-5 ${wishlisted ? "fill-primary text-primary" : ""}`} />
-              </Button>
-              <Button
-                className="h-12 flex-1 rounded-xl text-base font-semibold"
-                onClick={() => addToCart(product, quantity, selectedColor, selectedSize)}
-              >
-                <ShoppingCart className="mr-2 h-5 w-5" />
-                Add to Cart
-              </Button>
-            </div>
+        {/* Quantity Selector */}
+        <div className="flex items-center gap-4 mb-6">
+          <span className="text-sm font-medium text-foreground">Quantity</span>
+          <div className="flex items-center gap-3 bg-secondary rounded-lg p-1">
+            <button
+              onClick={decrementQuantity}
+              className="p-2 hover:bg-background rounded transition-colors"
+            >
+              <Minus className="w-4 h-4" />
+            </button>
+            <span className="w-8 text-center font-semibold">{quantity}</span>
+            <button
+              onClick={incrementQuantity}
+              className="p-2 hover:bg-background rounded transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+            </button>
           </div>
         </div>
 
-        {/* Related */}
-        {related.length > 0 && (
-          <section className="mt-12 px-4 lg:px-0">
-            <h2 className="text-lg font-bold text-foreground mb-4">Related Products</h2>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-              {related.map((p) => <ProductCard key={p.id} product={p} />)}
-            </div>
-          </section>
-        )}
+        {/* Color Selection */}
+        <div className="mb-6">
+          <h3 className="text-sm font-medium text-foreground mb-3">Color</h3>
+          <div className="flex flex-wrap gap-2">
+            {visibleColors.map((color, index) => (
+              <button
+                key={index}
+                onClick={() => setSelectedColor(color)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  selectedColor === color
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary text-foreground hover:bg-secondary/80"
+                }`}
+              >
+                {color}
+              </button>
+            ))}
+          </div>
+          {hasMoreColors && !showAllColors && (
+            <button
+              onClick={() => setShowAllColors(true)}
+              className="flex items-center gap-1 mt-3 text-sm text-primary hover:text-primary/80 font-medium"
+            >
+              See More
+              <ChevronDown className="w-4 h-4" />
+            </button>
+          )}
+          {showAllColors && (
+            <button
+              onClick={() => setShowAllColors(false)}
+              className="flex items-center gap-1 mt-3 text-sm text-primary hover:text-primary/80 font-medium"
+            >
+              Show Less
+              <ChevronUp className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
+        {/* Description */}
+        <div className="mb-6">
+          <h3 className="text-sm font-medium text-foreground mb-2">Description</h3>
+          <p className="text-sm text-muted-foreground">{product.description}</p>
+        </div>
+      </div>
+
+      {/* Related Products */}
+      {relatedProducts.length > 0 && (
+        <section className="py-6 border-t border-border">
+          <div className="px-4 mb-4">
+            <h2 className="text-lg font-bold text-foreground">Related Products</h2>
+          </div>
+          <div className="px-4 flex gap-3 overflow-x-auto scrollbar-hide pb-2">
+            {relatedProducts.slice(0, 6).map((relatedProduct) => (
+              <div key={relatedProduct.id} className="flex-shrink-0 w-[160px]">
+                <ProductCard product={relatedProduct} compact />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Fixed Bottom Actions */}
+      <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border p-4 z-40 md:pb-20">
+        {/* WhatsApp Button */}
+        <button
+          onClick={handleWhatsAppShare}
+          className="w-full flex items-center justify-center gap-2 bg-whatsapp text-white py-3 rounded-lg font-semibold mb-3 hover:bg-whatsapp/90 transition-colors"
+        >
+          <MessageCircle className="w-5 h-5" />
+          Share on WhatsApp
+        </button>
+
+        <div className="flex gap-3">
+          <button
+            onClick={handleAddToCart}
+            className="flex-1 flex items-center justify-center gap-2 bg-secondary text-foreground py-3 rounded-lg font-semibold hover:bg-secondary/80 transition-colors"
+          >
+            <ShoppingCart className="w-5 h-5" />
+            Add to Cart
+          </button>
+          <button
+            onClick={handleBuyNow}
+            className="flex-1 bg-primary text-primary-foreground py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+          >
+            Buy Now
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -1,20 +1,15 @@
-import { Outlet } from "react-router-dom";
+"use client";
 
-import BottomNav from "@/shared/components/layout/BottomNav";
-import DesktopHeader from "@/shared/components/layout/DesktopHeader";
-import MobileHeader from "@/shared/components/layout/MobileHeader";
-import SiteFooter from "@/shared/components/layout/SiteFooter";
+import { ReactNode } from "react";
 
-export function StoreLayout() {
+interface StoreLayoutProps {
+  children: ReactNode;
+}
+
+export function StoreLayout({ children }: StoreLayoutProps) {
   return (
-    <>
-      <DesktopHeader />
-      <MobileHeader />
-      <main>
-        <Outlet />
-      </main>
-      <SiteFooter />
-      <BottomNav />
-    </>
+    <div className="min-h-screen bg-background">
+      {children}
+    </div>
   );
 }
