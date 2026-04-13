@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
 
 const ADMIN_AUTH_KEY = "readmart_admin_authenticated";
 
@@ -11,12 +11,10 @@ type AdminAuthContextValue = {
 const AdminAuthContext = createContext<AdminAuthContextValue | undefined>(undefined);
 
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
-
-  useEffect(() => {
-    const stored = localStorage.getItem(ADMIN_AUTH_KEY);
-    setIsAdminAuthenticated(stored === "true");
-  }, []);
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem(ADMIN_AUTH_KEY) === "true";
+  });
 
   const value = useMemo<AdminAuthContextValue>(
     () => ({

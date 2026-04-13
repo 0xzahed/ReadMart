@@ -38,7 +38,7 @@ export interface Product {
   subcategory?: string;
   brand?: string;
   rating: number;
-  reviews: number;
+  reviews?: number;
   description: string;
   colors: string[];
   barcode?: string;

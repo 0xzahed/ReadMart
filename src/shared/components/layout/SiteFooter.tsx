@@ -6,7 +6,6 @@ const quickLinks = [
   { label: "Home", to: "/" },
   { label: "Explore", to: "/explore" },
   { label: "Cart", to: "/cart" },
-  { label: "Wishlist", to: "/wishlist" },
 ];
 
 const categoryLinks = [

@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { ShoppingCart, Heart, Search } from "lucide-react";
+import { ShoppingCart, Search } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { useCart } from "@/contexts/CartContext";
@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 const DesktopHeader = () => {
-  const { cartCount, wishlist } = useCart();
+  const { cartCount } = useCart();
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
 
@@ -48,16 +48,6 @@ const DesktopHeader = () => {
         </form>
 
         <div className="flex items-center gap-2">
-          <Link to="/wishlist">
-            <Button variant="ghost" size="icon" className="relative">
-              <Heart className="h-5 w-5" />
-              {wishlist.length > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
-                  {wishlist.length}
-                </span>
-              )}
-            </Button>
-          </Link>
           <Link to="/cart">
             <Button variant="ghost" size="icon" className="relative">
               <ShoppingCart className="h-5 w-5" />

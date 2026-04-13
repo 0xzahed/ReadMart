@@ -1,4 +1,4 @@
-import { Home, Search, ShoppingCart, Heart } from "lucide-react";
+import { Home, Search, ShoppingCart } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 
@@ -6,7 +6,6 @@ const navItems = [
   { icon: Home, label: "Home", path: "/" },
   { icon: Search, label: "Explore", path: "/explore" },
   { icon: ShoppingCart, label: "Cart", path: "/cart" },
-  { icon: Heart, label: "Wishlist", path: "/wishlist" },
 ];
 
 const BottomNav = () => {

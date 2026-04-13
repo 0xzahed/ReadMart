@@ -1,17 +1,26 @@
 "use client";
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Search, Bell, ShoppingCart } from "lucide-react";
 import { useStore } from "@/contexts/StoreContext";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 
 interface MobileHeaderProps {
   onSearch?: (query: string) => void;
 }
-
 export function MobileHeader({ onSearch }: MobileHeaderProps) {
+  const navigate = useNavigate();
   const {
     cart,
+    products,
     notifications,
     unreadNotificationCount,
     markNotificationAsRead,
@@ -19,6 +28,25 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
   } = useStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showCartDrawer, setShowCartDrawer] = useState(false);
+
+  const cartItems = cart
+    .map((item) => {
+      const product = products.find((p) => p.id === item.productId);
+      if (!product) return null;
+      return { ...item, product };
+    })
+    .filter(Boolean) as Array<{
+    productId: string;
+    quantity: number;
+    selectedColor?: string;
+    product: (typeof products)[0];
+  }>;
+
+  const cartTotal = cartItems.reduce(
+    (sum, item) => sum + item.product.price * item.quantity,
+    0
+  );
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,8 +121,9 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
         </div>
 
         {/* Cart Icon */}
-        <Link
-          to="/cart"
+        <button
+          type="button"
+          onClick={() => setShowCartDrawer(true)}
           className="relative p-2.5 rounded-full bg-secondary hover:bg-secondary/80 transition-colors"
         >
           <ShoppingCart className="w-5 h-5 text-foreground" />
@@ -103,7 +132,7 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
               {cart.length > 9 ? "9+" : cart.length}
             </span>
           )}
-        </Link>
+        </button>
       </div>
 
       <div className="mx-auto hidden w-full max-w-330 items-center gap-6 px-6 py-4 lg:flex">
@@ -176,8 +205,9 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
             )}
           </div>
 
-          <Link
-            to="/cart"
+          <button
+            type="button"
+            onClick={() => setShowCartDrawer(true)}
             className="relative rounded-full bg-secondary p-2.5 transition-colors hover:bg-secondary/80"
           >
             <ShoppingCart className="h-5 w-5 text-foreground" />
@@ -186,9 +216,52 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
                 {cart.length > 9 ? "9+" : cart.length}
               </span>
             )}
-          </Link>
+          </button>
         </div>
       </div>
+
+      <Drawer open={showCartDrawer} onOpenChange={setShowCartDrawer}>
+        <DrawerContent className="max-h-[82vh]">
+          <DrawerHeader>
+            <DrawerTitle>Cart ({cartItems.length})</DrawerTitle>
+            <DrawerDescription>Quick view of your cart items.</DrawerDescription>
+          </DrawerHeader>
+
+          <div className="px-4 pb-2 overflow-y-auto">
+            {cartItems.length === 0 ? (
+              <p className="py-8 text-center text-sm text-muted-foreground">Your cart is empty</p>
+            ) : (
+              <div className="space-y-3">
+                {cartItems.map((item) => (
+                  <div key={item.productId} className="rounded-lg border border-border/70 bg-card px-3 py-2">
+                    <p className="text-sm font-medium text-foreground line-clamp-1">{item.product.name}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Qty: {item.quantity} • ${(item.product.price * item.quantity).toFixed(2)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <DrawerFooter>
+            <div className="mb-1 flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">Total</span>
+              <span className="font-semibold text-foreground">${cartTotal.toFixed(2)}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setShowCartDrawer(false);
+                navigate("/cart");
+              }}
+              className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+            >
+              View Cart
+            </button>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
     </header>
   );
 }

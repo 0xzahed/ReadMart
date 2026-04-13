@@ -10,12 +10,9 @@ interface CartItem {
 
 interface CartContextType {
   items: CartItem[];
-  wishlist: Product[];
   addToCart: (product: Product, quantity?: number, color?: string, size?: string) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
-  toggleWishlist: (product: Product) => void;
-  isInWishlist: (productId: string) => boolean;
   cartTotal: number;
   cartCount: number;
   clearCart: () => void;
@@ -25,7 +22,6 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
-  const [wishlist, setWishlist] = useState<Product[]>([]);
 
   const addToCart = (product: Product, quantity = 1, color?: string, size?: string) => {
     setItems((prev) => {
@@ -53,16 +49,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
-  const toggleWishlist = (product: Product) => {
-    setWishlist((prev) =>
-      prev.find((p) => p.id === product.id)
-        ? prev.filter((p) => p.id !== product.id)
-        : [...prev, product]
-    );
-  };
-
-  const isInWishlist = (productId: string) => wishlist.some((p) => p.id === productId);
-
   const cartTotal = items.reduce((sum, i) => sum + i.product.price * i.quantity, 0);
   const cartCount = items.reduce((sum, i) => sum + i.quantity, 0);
 
@@ -70,7 +56,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <CartContext.Provider
-      value={{ items, wishlist, addToCart, removeFromCart, updateQuantity, toggleWishlist, isInWishlist, cartTotal, cartCount, clearCart }}
+      value={{ items, addToCart, removeFromCart, updateQuantity, cartTotal, cartCount, clearCart }}
     >
       {children}
     </CartContext.Provider>

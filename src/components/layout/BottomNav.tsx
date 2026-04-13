@@ -36,7 +36,7 @@ export function BottomNav() {
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <Icon className="w-6 h-6" />
+              <Icon className={`w-6 h-6 ${item.label === "Scan" ? "-translate-y-1" : ""}`} />
               <span className="text-xs mt-0.5 truncate">{item.label}</span>
             </Link>
           );
