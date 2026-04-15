@@ -28,8 +28,8 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
           
           {/* Discount Badge - Top Left */}
           {product.discountPercent > 0 && (
-            <div className="absolute left-2 top-2 rounded bg-red-500 px-2 py-1 text-xs font-bold text-white">
-              {product.discountPercent}% OFF
+            <div className="absolute left-2 top-2 rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground shadow-sm">
+              -{product.discountPercent}%
             </div>
           )}
         </div>
@@ -54,9 +54,11 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
 
             {/* Original Price - Crossed out, Gray */}
             {product.originalPrice > product.price && (
-              <span className="text-price-discounted text-xs line-through">
-                ${product.originalPrice.toFixed(2)}
-              </span>
+              <div className="flex items-center gap-1">
+                <span className="text-price-discounted text-xs line-through">
+                  ${product.originalPrice.toFixed(2)}
+                </span>
+              </div>
             )}
           </div>
         </div>

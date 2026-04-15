@@ -10,7 +10,6 @@ import {
   Minus,
   Plus,
   Tag,
-  CheckCircle,
 } from "lucide-react";
 import { useStore } from "@/contexts/StoreContext";
 import { StoreButton, StoreCard, StorePageHeader } from "@/components/ui/store";
@@ -42,7 +41,6 @@ export function CartPage() {
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerAddress, setCustomerAddress] = useState("");
-  const [orderSuccess, setOrderSuccess] = useState<{ id: string; status: string } | null>(null);
 
   const cartItems = cart.map((item) => {
     const product = products.find((p) => p.id === item.productId);
@@ -132,18 +130,13 @@ export function CartPage() {
     });
 
     toast.success("Order placed successfully!");
-    setOrderSuccess({ id: order.id, status: order.status });
     setShowCheckout(false);
     setCustomerName("");
     setCustomerPhone("");
     setCustomerAddress("");
     setPromoCode("");
     setAppliedDiscount(0);
-
-    setTimeout(() => {
-      setOrderSuccess(null);
-      navigate("/orders");
-    }, 2200);
+    navigate(`/order-confirmation?track=${encodeURIComponent(order.trackingToken || "")}`);
   };
 
   const editingProduct = products.find((p) => p.id === editingProductId);
@@ -201,7 +194,7 @@ export function CartPage() {
                     Color: {item.selectedColor}
                   </p>
                 )}
-                <p className="text-lg font-bold text-price-original mt-2">
+                <p className="mt-2 text-lg font-bold text-muted-foreground">
                   ${(item.product.price * item.quantity).toFixed(2)}
                 </p>
 
@@ -423,29 +416,6 @@ export function CartPage() {
         </div>
       )}
 
-      {/* Order Success Tick */}
-      {orderSuccess && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4">
-          <div className="w-full max-w-sm rounded-xl bg-card p-6 text-center shadow-xl">
-            <CheckCircle className="mx-auto mb-3 h-14 w-14 text-success" />
-            <h3 className="text-lg font-bold text-foreground">Order sent successfully</h3>
-            <p className="mt-2 text-sm text-muted-foreground">Order ID: #{orderSuccess.id}</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Current status: <span className="font-semibold capitalize text-foreground">{orderSuccess.status}</span>
-            </p>
-            <StoreButton
-              onClick={() => {
-                setOrderSuccess(null);
-                navigate("/orders");
-              }}
-              className="mt-5"
-              fullWidth
-            >
-              View Orders
-            </StoreButton>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

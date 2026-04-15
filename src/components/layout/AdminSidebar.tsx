@@ -18,6 +18,7 @@ import {
   ChevronDown,
   ChevronRight,
 } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface AdminSidebarProps {
   isOpen: boolean;
@@ -150,18 +151,27 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
 
       return (
         <li key={groupKey}>
-          <Link
+          <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.18 }}>
+            <Link
             to={href}
             onClick={onClose}
-            className={`flex items-center gap-3 rounded-xl border px-3.5 py-3 text-sm font-medium shadow-[0_1px_2px_rgba(15,23,42,0.05)] transition-colors ${
+            className={`relative flex items-center gap-3 rounded-xl border px-3.5 py-3 text-sm font-medium shadow-[0_1px_2px_rgba(15,23,42,0.05)] transition-colors ${
               active
-                ? "border-primary/20 bg-primary/10 text-primary shadow-sm"
-                : "border-slate-200/70 bg-white/70 text-slate-600 hover:border-slate-300/80 hover:bg-white hover:text-slate-900"
+                ? "border-primary/35 bg-primary/12 text-primary shadow-sm"
+                : "border-slate-200/80 bg-white/75 text-slate-600 hover:border-slate-300 hover:bg-white hover:text-slate-900"
             }`}
           >
+            {active && (
+              <motion.span
+                layoutId="admin-active-pill"
+                className="absolute inset-0 rounded-xl border border-primary/40"
+                transition={{ type: "spring", stiffness: 380, damping: 30 }}
+              />
+            )}
             <Icon className="h-5 w-5 shrink-0" />
             <span>{item.label}</span>
-          </Link>
+            </Link>
+          </motion.div>
         </li>
       );
     }
@@ -172,47 +182,61 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
 
     return (
       <li key={groupKey}>
-        <button
+        <motion.button
           onClick={() => toggleMenu(groupKey)}
+          whileHover={{ x: 2 }}
+          transition={{ duration: 0.18 }}
           className={`flex w-full items-center justify-between gap-3 rounded-xl border px-3.5 py-3 text-sm font-medium shadow-[0_1px_2px_rgba(15,23,42,0.05)] transition-colors ${
             isActive
-              ? "border-primary/20 bg-primary/10 text-primary shadow-sm"
-              : "border-slate-200/70 bg-white/70 text-slate-600 hover:border-slate-300/80 hover:bg-white hover:text-slate-900"
+              ? "border-primary/35 bg-primary/12 text-primary shadow-sm"
+              : "border-slate-200/80 bg-white/75 text-slate-600 hover:border-slate-300 hover:bg-white hover:text-slate-900"
           }`}
         >
           <div className="flex items-center gap-3">
             <Icon className="h-5 w-5 shrink-0" />
             <span>{item.label}</span>
           </div>
-          {isOpen ? (
-            <ChevronDown className="h-4 w-4 shrink-0" />
-          ) : (
-            <ChevronRight className="h-4 w-4 shrink-0" />
-          )}
-        </button>
+          <motion.span animate={{ rotate: isOpen ? 0 : -90 }} transition={{ duration: 0.2 }}>
+            {isOpen ? (
+              <ChevronDown className="h-4 w-4 shrink-0" />
+            ) : (
+              <ChevronRight className="h-4 w-4 shrink-0" />
+            )}
+          </motion.span>
+        </motion.button>
 
-        {isOpen && (
-          <ul className="ml-8 mt-2 space-y-1.5 border-l-2 border-slate-200/90 pl-3.5">
-            {item.children!.map((child) => {
-              const childActive = isActiveTab(child.tab);
-              return (
-                <li key={child.tab}>
-                  <Link
-                    to={`${item.href}?tab=${child.tab}`}
-                    onClick={onClose}
-                    className={`flex items-center gap-3 rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
-                      childActive
-                        ? "border-primary/20 bg-primary/10 text-primary"
-                        : "border-slate-200/70 bg-white/70 text-slate-500 hover:border-slate-300/80 hover:bg-white hover:text-slate-700"
-                    }`}
-                  >
-                    <span>{child.label}</span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        )}
+        <AnimatePresence initial={false}>
+          {isOpen && (
+            <motion.ul
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.22, ease: "easeOut" }}
+              className="ml-8 mt-2 space-y-1.5 overflow-hidden border-l-2 border-slate-200/90 pl-3.5"
+            >
+              {item.children!.map((child) => {
+                const childActive = isActiveTab(child.tab);
+                return (
+                  <li key={child.tab}>
+                    <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.16 }}>
+                      <Link
+                        to={`${item.href}?tab=${child.tab}`}
+                        onClick={onClose}
+                        className={`flex items-center gap-3 rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
+                          childActive
+                            ? "border-primary/35 bg-primary/12 text-primary"
+                            : "border-slate-200/70 bg-white/75 text-slate-500 hover:border-slate-300 hover:bg-white hover:text-slate-700"
+                        }`}
+                      >
+                        <span>{child.label}</span>
+                      </Link>
+                    </motion.div>
+                  </li>
+                );
+              })}
+            </motion.ul>
+          )}
+        </AnimatePresence>
       </li>
     );
   };
@@ -228,7 +252,10 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
       )}
 
       {/* Sidebar */}
-      <aside
+      <motion.aside
+        initial={false}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.2 }}
         className={`fixed left-0 top-0 z-50 flex h-full w-72 flex-col border-r border-slate-200/80 bg-linear-to-b from-white via-slate-50 to-slate-100/70 shadow-[0_12px_32px_rgba(15,23,42,0.08)] transition-transform duration-300 ease-out lg:sticky lg:z-20 lg:translate-x-0 lg:shadow-none ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
@@ -256,7 +283,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
             <span>Logout</span>
           </Link>
         </div>
-      </aside>
+      </motion.aside>
     </>
   );
 }

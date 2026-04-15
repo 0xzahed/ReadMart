@@ -33,8 +33,8 @@ export function AdminLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-secondary/35">
-      <header className="border-b border-border bg-background">
+    <div className="min-h-screen bg-secondary/35 transition-colors duration-300">
+      <header className="border-b border-border bg-background/95 backdrop-blur transition-all duration-300">
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link to="/" className="flex items-center gap-2 font-semibold text-foreground">
             <Store className="h-5 w-5 text-primary" />
@@ -84,7 +84,7 @@ export function AdminLayout() {
           </nav>
         </aside>
 
-        <main>
+        <main className="transition-all duration-300 ease-out">
           <Outlet />
         </main>
       </div>

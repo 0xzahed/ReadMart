@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronRight } from "lucide-react";
-import { BottomNav } from "@/components/layout/BottomNav";
 import { useStore } from "@/contexts/StoreContext";
 
 export function CategoriesPage() {
@@ -18,7 +17,7 @@ export function CategoriesPage() {
         <div className="mx-auto flex w-full max-w-330 items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
           <button
             onClick={() => navigate(-1)}
-            className="rounded-full p-2 transition-colors hover:bg-secondary"
+            className="p-2 text-foreground"
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
@@ -69,8 +68,6 @@ export function CategoriesPage() {
           })}
         </div>
       </div>
-
-      <BottomNav />
     </div>
   );
 }

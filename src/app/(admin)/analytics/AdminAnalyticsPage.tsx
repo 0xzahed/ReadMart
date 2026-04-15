@@ -140,7 +140,7 @@ export function AdminAnalyticsPage() {
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  label={({ name, percent = 0 }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                 >
                   {trafficData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={index === 0 ? "hsl(var(--primary))" : index === 1 ? "hsl(var(--status-info))" : index === 2 ? "hsl(var(--status-success))" : "hsl(var(--status-warning))"} />

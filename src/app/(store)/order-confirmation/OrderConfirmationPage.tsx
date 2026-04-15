@@ -1,16 +1,39 @@
 "use client";
 
-import { Link, useNavigate } from "react-router-dom";
-import { CheckCircle } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Check, CheckCircle, CircleDashed } from "lucide-react";
 import { useStore } from "@/contexts/StoreContext";
 import { StoreButton, StoreCard } from "@/components/ui/store";
 import { OrderItem } from "./components/OrderItem";
 
 export function OrderConfirmationPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { orders, products } = useStore();
+  const [visibleStepCount, setVisibleStepCount] = useState(0);
 
-  const latestOrder = orders[orders.length - 1];
+  const trackToken = searchParams.get("track") || "";
+  const latestOrder = useMemo(() => {
+    if (trackToken) {
+      const matched = orders.find((order) => order.trackingToken === trackToken);
+      if (matched) return matched;
+    }
+    return orders[orders.length - 1];
+  }, [orders, trackToken]);
+  const trackingLink =
+    typeof window !== "undefined" && latestOrder?.trackingToken
+      ? `${window.location.origin}/orders?track=${latestOrder.trackingToken}`
+      : "";
+
+  useEffect(() => {
+    const timers = [500, 900, 1300].map((delay, index) =>
+      window.setTimeout(() => {
+        setVisibleStepCount(index + 1);
+      }, delay)
+    );
+    return () => timers.forEach((timer) => window.clearTimeout(timer));
+  }, []);
 
   if (!latestOrder) {
     return (
@@ -55,6 +78,29 @@ export function OrderConfirmationPage() {
         <p className="text-muted-foreground">
           Your order has been confirmed and will be processed soon
         </p>
+      </div>
+
+      <div className="px-4 py-4">
+        <StoreCard padding="lg">
+          <h3 className="mb-3 font-semibold text-foreground">Order placed</h3>
+          <div className="space-y-2">
+            {["Order received", "Payment confirmed", "Preparing for delivery"].map((label, index) => {
+              const isDone = visibleStepCount > index;
+              return (
+                <div key={label} className="flex items-center gap-2">
+                  {isDone ? (
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-success text-white">
+                      <Check className="h-3.5 w-3.5" />
+                    </span>
+                  ) : (
+                    <CircleDashed className="h-5 w-5 text-muted-foreground" />
+                  )}
+                  <span className={isDone ? "text-foreground" : "text-muted-foreground"}>{label}</span>
+                </div>
+              );
+            })}
+          </div>
+        </StoreCard>
       </div>
 
       {/* Order Details */}
@@ -141,11 +187,30 @@ export function OrderConfirmationPage() {
 
       {/* Actions */}
       <div className="px-4 py-6 space-y-3">
-        <StoreButton onClick={() => navigate("/orders")} fullWidth size="lg">
-          View All Orders
+        <StoreButton asChild fullWidth size="lg">
+          <Link to="/">Go to Home</Link>
         </StoreButton>
-        <StoreButton asChild tone="secondary" fullWidth size="lg">
-          <Link to="/">Continue Shopping</Link>
+        {trackingLink ? (
+          <>
+            <Link
+              to={`/orders?track=${encodeURIComponent(latestOrder.trackingToken || "")}`}
+              className="block text-center text-sm font-medium text-primary underline underline-offset-2"
+            >
+              Track this order
+            </Link>
+            <StoreButton
+              tone="secondary"
+              fullWidth
+              onClick={async () => {
+                await navigator.clipboard.writeText(trackingLink);
+              }}
+            >
+              Copy Tracking Link
+            </StoreButton>
+          </>
+        ) : null}
+        <StoreButton onClick={() => navigate("/orders")} tone="ghost" fullWidth>
+          View All Orders
         </StoreButton>
       </div>
     </div>

@@ -149,7 +149,7 @@ export function ScanPage() {
               stopCamera();
               navigate(-1);
             }}
-            className="p-2 hover:bg-secondary rounded-full transition-colors"
+            className="p-2 text-foreground"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>

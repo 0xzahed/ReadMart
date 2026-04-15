@@ -5,7 +5,6 @@ import Image from "next/image";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Search } from "lucide-react";
 import { ProductCard } from "@/components/store/ProductCard";
-import { BottomNav } from "@/components/layout/BottomNav";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import { useStore } from "@/contexts/StoreContext";
 
@@ -108,7 +107,7 @@ export function CategoryProductsPage() {
           <div className="mb-3 flex items-center gap-3">
             <button
               onClick={() => navigate(-1)}
-              className="rounded-full p-2 transition-colors hover:bg-secondary"
+              className="p-2 text-foreground"
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
@@ -201,8 +200,6 @@ export function CategoryProductsPage() {
           </div>
         )}
       </div>
-
-      <BottomNav />
     </div>
   );
 }

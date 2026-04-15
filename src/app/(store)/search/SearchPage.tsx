@@ -33,7 +33,7 @@ export function SearchPage() {
         <div className="mx-auto flex w-full max-w-330 items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
           <button
             onClick={() => navigate(-1)}
-            className="p-2 hover:bg-secondary rounded-full transition-colors"
+            className="p-2 text-foreground"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>

@@ -2,7 +2,6 @@
 
 import { useNavigate } from "react-router-dom";
 import { MobileHeader } from "@/components/layout/MobileHeader";
-import { BottomNav } from "@/components/layout/BottomNav";
 import { HeroSlider } from "@/components/sections/HeroSlider";
 import { CategoriesGrid } from "@/components/sections/CategoriesGrid";
 import { FlashDeals } from "@/components/sections/FlashDeals";
@@ -109,9 +108,6 @@ export function HomePage() {
           </div>
         </section>
       ))}
-
-      {/* Bottom Navigation */}
-      <BottomNav />
     </div>
   );
 }

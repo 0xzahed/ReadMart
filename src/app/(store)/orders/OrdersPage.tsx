@@ -2,15 +2,20 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import Image from "next/image";
 import { Package, ChevronRight } from "lucide-react";
 import { useStore, Order } from "@/contexts/StoreContext";
 import { StoreButton, StoreCard, StorePageHeader } from "@/components/ui/store";
 
 export function OrdersPage() {
-  const { orders } = useStore();
+  const { orders, products } = useStore();
+  const [searchParams] = useSearchParams();
   const [filter, setFilter] = useState<"all" | Order["status"]>("all");
+  const [trackingInput, setTrackingInput] = useState(searchParams.get("track") || "");
 
   const filteredOrders = filter === "all" ? orders : orders.filter((o) => o.status === filter);
+  const trackedOrder = orders.find((order) => order.trackingToken === trackingInput.trim());
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -26,6 +31,12 @@ export function OrdersPage() {
         return "bg-muted text-muted-foreground";
     }
   };
+  const formatStatusLabel = (status: Order["status"]) => {
+    if (status === "confirmed") return "confirmed";
+    if (status === "cancelled") return "rejected";
+    if (status === "delivered") return "delivered";
+    return "pending";
+  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -40,8 +51,37 @@ export function OrdersPage() {
     <div className="min-h-screen bg-background pb-20">
       <StorePageHeader title="My Orders" backTo="/" />
 
+      <div className="mx-auto w-full max-w-330 px-4 pt-4 sm:px-6 lg:px-8">
+        <StoreCard className="space-y-3">
+          <h3 className="font-semibold text-foreground">Check by Tracking Link</h3>
+          <input
+            type="text"
+            value={trackingInput}
+            onChange={(e) => {
+              const value = e.target.value;
+              const parsedToken = value.includes("track=") ? value.split("track=")[1] : value;
+              setTrackingInput(parsedToken);
+            }}
+            placeholder="Paste tracking link or token"
+            className="h-11 w-full rounded-lg border border-border bg-background px-3 text-sm"
+          />
+          {trackingInput.trim() ? (
+            trackedOrder ? (
+              <div className="rounded-lg border border-border/70 bg-secondary/30 p-3">
+                <p className="text-sm text-foreground">Order: #{trackedOrder.id}</p>
+                <p className="text-sm text-muted-foreground">
+                  Status: <span className="font-semibold capitalize text-foreground">{formatStatusLabel(trackedOrder.status)}</span>
+                </p>
+              </div>
+            ) : (
+              <p className="text-sm text-destructive">Tracking order not found.</p>
+            )
+          ) : null}
+        </StoreCard>
+      </div>
+
       {/* Filter Tabs */}
-      <div className="border-b border-border">
+      <div className="mt-4 border-b border-border">
         <div className="mx-auto w-full max-w-330 overflow-x-auto px-4 py-3 scrollbar-hide sm:px-6 lg:px-8">
           <div className="flex gap-2">
           {(["all", "pending", "confirmed", "delivered", "cancelled"] as const).map((status) => (
@@ -86,11 +126,20 @@ export function OrdersPage() {
                     order.status
                   )}`}
                 >
-                  {order.status}
+                  {formatStatusLabel(order.status)}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between pt-3 border-t border-border">
+              <div className="flex items-center justify-between gap-3 border-t border-border pt-3">
+                {(() => {
+                  const firstItem = order.items[0];
+                  const firstProduct = products.find((p) => p.id === firstItem?.productId);
+                  return firstProduct ? (
+                    <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-md bg-secondary">
+                      <Image src={firstProduct.images[0]} alt={firstProduct.name} fill className="object-cover" />
+                    </div>
+                  ) : null;
+                })()}
                 <div>
                   <p className="text-xs text-muted-foreground">
                     {order.items.length} item{order.items.length > 1 ? "s" : ""}

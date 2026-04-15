@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Image from "next/image";
 import { Search, Bell, ShoppingCart } from "lucide-react";
 import { useStore } from "@/contexts/StoreContext";
 import {
@@ -21,14 +22,12 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
   const {
     cart,
     products,
-    notifications,
     unreadNotificationCount,
-    markNotificationAsRead,
-    markAllNotificationsAsRead,
   } = useStore();
   const [searchQuery, setSearchQuery] = useState("");
-  const [showNotifications, setShowNotifications] = useState(false);
   const [showCartDrawer, setShowCartDrawer] = useState(false);
+  const [searchExpanded, setSearchExpanded] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const cartItems = cart
     .map((item) => {
@@ -55,84 +54,82 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
     }
   };
 
+  useEffect(() => {
+    if (searchExpanded && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [searchExpanded]);
+
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/90">
-      <div className="flex items-center gap-2 p-3 lg:hidden">
-        {/* Search Bar */}
-        <form onSubmit={handleSearch} className="flex-1 relative">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="Search"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-full bg-secondary text-foreground placeholder:text-muted-foreground border-0 focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
-        </form>
+      {/* Mobile Header */}
+      <div className="p-3 lg:hidden">
+        {/* Top Bar */}
+        <div className="flex items-center justify-between gap-3">
+          {/* Logo - always visible */}
+          <Link to="/" className="text-lg font-bold text-primary shrink-0">ReadMart</Link>
 
-        {/* Notification Icon */}
-        <div className="relative">
+          <div className="flex flex-1 items-center justify-end gap-2 min-w-0">
+            {/* Search icon + inline expanding field */}
+            <div className="flex items-center justify-end min-w-0">
+              {searchExpanded ? (
+                <form onSubmit={handleSearch} className="w-[150px]">
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    placeholder="Search..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onBlur={() => {
+                      if (!searchQuery.trim()) {
+                        setSearchExpanded(false);
+                      }
+                    }}
+                    className="w-full rounded-md border border-border bg-transparent px-2 py-1 text-sm text-foreground shadow-none placeholder:text-muted-foreground focus:outline-none focus:ring-0"
+                  />
+                </form>
+              ) : (
+                <button
+                  onClick={() => setSearchExpanded(true)}
+                  className="relative p-2.5 rounded-full bg-secondary hover:bg-secondary/80 transition-colors"
+                >
+                  <Search className="w-5 h-5 text-foreground" />
+                </button>
+              )}
+            </div>
+
+            {/* Notification Icon */}
+          <div className="relative">
+            <button
+              onClick={() => navigate("/notifications")}
+              className="relative p-2.5 rounded-full bg-secondary hover:bg-secondary/80 transition-colors"
+            >
+              <Bell className="w-5 h-5 text-foreground" />
+              {unreadNotificationCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-primary text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-semibold">
+                  {unreadNotificationCount > 9 ? "9+" : unreadNotificationCount}
+                </span>
+              )}
+            </button>
+
+          </div>
+
+          {/* Cart Icon */}
           <button
-            onClick={() => setShowNotifications(!showNotifications)}
+            type="button"
+            onClick={() => setShowCartDrawer(true)}
             className="relative p-2.5 rounded-full bg-secondary hover:bg-secondary/80 transition-colors"
           >
-            <Bell className="w-5 h-5 text-foreground" />
-            {unreadNotificationCount > 0 && (
+            <ShoppingCart className="w-5 h-5 text-foreground" />
+            {cart.length > 0 && (
               <span className="absolute -top-1 -right-1 bg-primary text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-semibold">
-                {unreadNotificationCount > 9 ? "9+" : unreadNotificationCount}
+                {cart.length > 9 ? "9+" : cart.length}
               </span>
             )}
           </button>
-
-          {/* Notifications Dropdown */}
-          {showNotifications && (
-            <div className="absolute right-0 top-full mt-2 w-80 bg-card rounded-lg shadow-lg border border-border overflow-hidden z-50">
-              <div className="flex items-center justify-between p-3 border-b border-border">
-                <h3 className="font-semibold text-foreground">Notifications</h3>
-                {unreadNotificationCount > 0 && (
-                  <button
-                    onClick={markAllNotificationsAsRead}
-                    className="text-xs font-medium text-primary hover:text-primary/80"
-                  >
-                    Mark all read
-                  </button>
-                )}
-              </div>
-              <div className="max-h-80 overflow-y-auto">
-                {notifications.length === 0 ? (
-                  <div className="p-3 text-sm text-muted-foreground">No notifications yet</div>
-                ) : (
-                  notifications.slice(0, 8).map((notification) => (
-                    <button
-                      key={notification.id}
-                      onClick={() => markNotificationAsRead(notification.id)}
-                      className="w-full p-3 hover:bg-secondary/50 text-left"
-                    >
-                      <p className="text-sm font-medium text-foreground">{notification.title}</p>
-                      <p className="text-xs text-muted-foreground">{notification.message}</p>
-                    </button>
-                  ))
-                )}
-              </div>
-            </div>
-          )}
+          </div>
         </div>
 
-        {/* Cart Icon */}
-        <button
-          type="button"
-          onClick={() => setShowCartDrawer(true)}
-          className="relative p-2.5 rounded-full bg-secondary hover:bg-secondary/80 transition-colors"
-        >
-          <ShoppingCart className="w-5 h-5 text-foreground" />
-          {cart.length > 0 && (
-            <span className="absolute -top-1 -right-1 bg-primary text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-semibold">
-              {cart.length > 9 ? "9+" : cart.length}
-            </span>
-          )}
-        </button>
       </div>
 
       <div className="mx-auto hidden w-full max-w-330 items-center gap-6 px-6 py-4 lg:flex">
@@ -154,14 +151,14 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
             placeholder="Search products"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-11 w-full rounded-full border-0 bg-secondary pl-11 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            className="h-11 w-full rounded-full border border-border bg-secondary pl-11 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </form>
 
         <div className="flex items-center gap-2">
           <div className="relative">
             <button
-              onClick={() => setShowNotifications(!showNotifications)}
+              onClick={() => navigate("/notifications")}
               className="relative rounded-full bg-secondary p-2.5 transition-colors hover:bg-secondary/80"
             >
               <Bell className="h-5 w-5 text-foreground" />
@@ -171,38 +168,6 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
                 </span>
               )}
             </button>
-
-            {showNotifications && (
-              <div className="absolute right-0 top-full z-50 mt-2 w-80 overflow-hidden rounded-lg border border-border bg-card shadow-lg">
-                <div className="flex items-center justify-between border-b border-border p-3">
-                  <h3 className="font-semibold text-foreground">Notifications</h3>
-                  {unreadNotificationCount > 0 && (
-                    <button
-                      onClick={markAllNotificationsAsRead}
-                      className="text-xs font-medium text-primary hover:text-primary/80"
-                    >
-                      Mark all read
-                    </button>
-                  )}
-                </div>
-                <div className="max-h-80 overflow-y-auto">
-                  {notifications.length === 0 ? (
-                    <div className="p-3 text-sm text-muted-foreground">No notifications yet</div>
-                  ) : (
-                    notifications.slice(0, 8).map((notification) => (
-                      <button
-                        key={notification.id}
-                        onClick={() => markNotificationAsRead(notification.id)}
-                        className="w-full cursor-pointer p-3 hover:bg-secondary/50 text-left"
-                      >
-                        <p className="text-sm font-medium text-foreground">{notification.title}</p>
-                        <p className="text-xs text-muted-foreground">{notification.message}</p>
-                      </button>
-                    ))
-                  )}
-                </div>
-              </div>
-            )}
           </div>
 
           <button
@@ -221,23 +186,28 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
       </div>
 
       <Drawer open={showCartDrawer} onOpenChange={setShowCartDrawer}>
-        <DrawerContent className="max-h-[82vh]">
+        <DrawerContent className="flex h-[50vh] max-h-[50vh] flex-col">
           <DrawerHeader>
             <DrawerTitle>Cart ({cartItems.length})</DrawerTitle>
             <DrawerDescription>Quick view of your cart items.</DrawerDescription>
           </DrawerHeader>
 
-          <div className="px-4 pb-2 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto px-4 pb-2">
             {cartItems.length === 0 ? (
               <p className="py-8 text-center text-sm text-muted-foreground">Your cart is empty</p>
             ) : (
               <div className="space-y-3">
                 {cartItems.map((item) => (
-                  <div key={item.productId} className="rounded-lg border border-border/70 bg-card px-3 py-2">
-                    <p className="text-sm font-medium text-foreground line-clamp-1">{item.product.name}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      Qty: {item.quantity} • ${(item.product.price * item.quantity).toFixed(2)}
-                    </p>
+                  <div key={item.productId} className="flex items-center gap-3 rounded-lg border border-border/70 bg-card px-3 py-2">
+                    <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-md bg-secondary">
+                      <Image src={item.product.images[0]} alt={item.product.name} fill className="object-cover" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-foreground line-clamp-1">{item.product.name}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Qty: {item.quantity} • ${(item.product.price * item.quantity).toFixed(2)}
+                      </p>
+                    </div>
                   </div>
                 ))}
               </div>

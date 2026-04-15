@@ -29,13 +29,19 @@ export function StorePageHeader({
       <div className="mx-auto flex w-full max-w-330 items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
         <div className="flex min-w-0 items-center gap-3">
           {backTo ? (
-            <StoreButton asChild tone="secondary" size="icon" aria-label="Go back">
+            <StoreButton asChild tone="ghost" size="icon" className="hover:bg-transparent" aria-label="Go back">
               <Link to={backTo}>
                 <ArrowLeft className="h-5 w-5" />
               </Link>
             </StoreButton>
           ) : onBack ? (
-            <StoreButton tone="secondary" size="icon" onClick={onBack} aria-label="Go back">
+            <StoreButton
+              tone="ghost"
+              size="icon"
+              className="hover:bg-transparent"
+              onClick={onBack}
+              aria-label="Go back"
+            >
               <ArrowLeft className="h-5 w-5" />
             </StoreButton>
           ) : null}

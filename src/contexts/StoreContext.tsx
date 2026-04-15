@@ -41,6 +41,11 @@ export interface Product {
   reviews?: number;
   description: string;
   colors: string[];
+  specifications?: Array<{
+    label: string;
+    value: string;
+    icon?: string;
+  }>;
   barcode?: string;
   inStock: boolean;
   isFlashDeal: boolean;
@@ -64,6 +69,7 @@ export interface PromoCode {
 
 export interface Order {
   id: string;
+  trackingToken?: string;
   items: CartItem[];
   total: number;
   subtotal: number;
@@ -155,6 +161,7 @@ const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 // Helper to generate unique IDs
 const generateId = () => Math.random().toString(36).substr(2, 9);
+const generateTrackingToken = () => `RM-${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
 
 // Sample data
 const sampleSliders: Slider[] = [
@@ -165,6 +172,42 @@ const sampleSliders: Slider[] = [
     subtitle: "Extraordinary Visual & Exceptional Power",
     buttonText: "Shop Now",
     buttonLink: "/product/1",
+    isActive: true,
+  },
+  {
+    id: "2",
+    image: handbag1.src,
+    title: "Galaxy S24 Ultra",
+    subtitle: "Performance and style together",
+    buttonText: "Shop Now",
+    buttonLink: "/product/2",
+    isActive: true,
+  },
+  {
+    id: "3",
+    image: headphones1.src,
+    title: "Sony WH-1000XM5",
+    subtitle: "Premium sound quality",
+    buttonText: "Shop Now",
+    buttonLink: "/product/3",
+    isActive: true,
+  },
+  {
+    id: "4",
+    image: watch1.src,
+    title: "MacBook Pro 16",
+    subtitle: "Power for professionals",
+    buttonText: "Shop Now",
+    buttonLink: "/product/4",
+    isActive: true,
+  },
+  {
+    id: "5",
+    image: dress1.src,
+    title: "iPad Air M2",
+    subtitle: "Lightweight and powerful",
+    buttonText: "Shop Now",
+    buttonLink: "/product/5",
     isActive: true,
   },
 ];
@@ -222,6 +265,10 @@ const sampleCategories: Category[] = [
 
 const defaultSliderImagesById: Record<string, string> = {
   "1": sneaker1.src,
+  "2": handbag1.src,
+  "3": headphones1.src,
+  "4": watch1.src,
+  "5": dress1.src,
 };
 
 const defaultCategoryImagesById: Record<string, string> = {
@@ -292,15 +339,25 @@ const normalizeProductsWithImages = (products: Product[]): Product[] => {
 
     const fallbackImages = defaultProductImagesById[product.id];
 
+    const normalizedSpecifications = Array.isArray(product.specifications)
+      ? product.specifications
+          .map((item) => ({
+            label: (item?.label || "").trim(),
+            value: (item?.value || "").trim(),
+            icon: (item?.icon || "").trim() || undefined,
+          }))
+          .filter((item) => item.label && item.value)
+      : [];
+
     if (!fallbackImages) {
-      return { ...product, images: currentImages };
+      return { ...product, images: currentImages, specifications: normalizedSpecifications };
     }
 
     if (currentImages.length === 0 || currentImages.every(isPlaceholderImage)) {
-      return { ...product, images: fallbackImages };
+      return { ...product, images: fallbackImages, specifications: normalizedSpecifications };
     }
 
-    return { ...product, images: currentImages };
+    return { ...product, images: currentImages, specifications: normalizedSpecifications };
   });
 };
 
@@ -318,6 +375,12 @@ const sampleProducts: Product[] = [
     reviews: 234,
     description: "The ultimate iPhone experience with advanced camera system and A18 Pro chip.",
     colors: ["Desert Titanium", "Natural Titanium", "White Titanium", "Black Titanium"],
+    specifications: [
+      { label: "Display", value: "6.9-inch 4K Ultra HD XDR", icon: "display" },
+      { label: "Chipset", value: "A18 Pro", icon: "cpu" },
+      { label: "Camera", value: "48MP Pro camera system", icon: "camera" },
+      { label: "Wireless Charging", value: "MagSafe supported", icon: "wifi" },
+    ],
     barcode: "890100000001",
     inStock: true,
     isFlashDeal: true,
@@ -752,6 +815,7 @@ export const StoreProvider = ({ children }: { children: ReactNode }) => {
     const newOrder = {
       ...order,
       id: generateId(),
+      trackingToken: order.trackingToken || generateTrackingToken(),
       createdAt: new Date().toISOString(),
     };
     setOrders((prev) => [...prev, newOrder]);

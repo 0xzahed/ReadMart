@@ -2,7 +2,6 @@
 
 import { useNavigate } from "react-router-dom";
 
-import { BottomNav } from "@/components/layout/BottomNav";
 import { ProductCard } from "@/components/store/ProductCard";
 import { StorePageHeader } from "@/components/ui/store";
 import { useStore } from "@/contexts/StoreContext";
@@ -32,8 +31,6 @@ export function TrendingProductsPage() {
           </div>
         )}
       </div>
-
-      <BottomNav />
     </div>
   );
 }

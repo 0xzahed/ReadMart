@@ -52,6 +52,19 @@ const readImageAsDataUrl = (file: File): Promise<string> => {
 const formatCurrency = (value: number) => `$${value.toFixed(2)}`;
 
 const orderStatusOptions: Order["status"][] = ["pending", "confirmed", "cancelled", "delivered"];
+const productSpecIconOptions = [
+  "display",
+  "cpu",
+  "camera",
+  "battery",
+  "wifi",
+  "bluetooth",
+  "storage",
+  "memory",
+  "shield",
+  "speaker",
+  "zap",
+];
 
 const statusBadgeClass = (status: Order["status"]) => {
   if (status === "pending") return "bg-amber-100 text-amber-700";
@@ -457,9 +470,11 @@ function ProductManagement() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [searchText, setSearchText] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  type ProductSpecForm = { label: string; value: string; icon: string };
   const [formData, setFormData] = useState({
     name: "", price: 0, originalPrice: 0, images: [""], category: "",
     brand: "", rating: 0, reviews: "", description: "", colors: [""],
+    specifications: [{ label: "", value: "", icon: "display" }] as ProductSpecForm[],
     barcode: "", subcategory: "", inStock: true, isFlashDeal: false, discountPercent: 0,
   });
 
@@ -471,6 +486,14 @@ function ProductManagement() {
         images: product.images, category: product.category, brand: product.brand || "",
         rating: product.rating, reviews: product.reviews ? String(product.reviews) : "", description: product.description,
         colors: product.colors, barcode: product.barcode || "", subcategory: product.subcategory || "", inStock: product.inStock,
+        specifications:
+          product.specifications && product.specifications.length > 0
+            ? product.specifications.map((spec) => ({
+                label: spec.label,
+                value: spec.value,
+                icon: spec.icon || "display",
+              }))
+            : [{ label: "", value: "", icon: "display" }],
         isFlashDeal: product.isFlashDeal, discountPercent: product.discountPercent,
       });
     } else {
@@ -480,6 +503,7 @@ function ProductManagement() {
       setFormData({
         name: "", price: 0, originalPrice: 0, images: [""], category: defaultCategoryId,
         brand: "", rating: 0, reviews: "", description: "", colors: [""],
+        specifications: [{ label: "", value: "", icon: "display" }],
         barcode: "", subcategory: defaultSubcategory, inStock: true, isFlashDeal: false, discountPercent: 0,
       });
     }
@@ -490,6 +514,13 @@ function ProductManagement() {
     e.preventDefault();
     const cleanImage = formData.images[0]?.trim();
     const cleanColors = formData.colors.map((color) => color.trim()).filter(Boolean);
+    const cleanSpecifications = formData.specifications
+      .map((spec) => ({
+        label: spec.label.trim(),
+        value: spec.value.trim(),
+        icon: spec.icon.trim() || undefined,
+      }))
+      .filter((spec) => spec.label && spec.value);
 
     if (!formData.name || !formData.category || !cleanImage) {
       toast.error("Please fill in required fields");
@@ -500,6 +531,7 @@ function ProductManagement() {
       ...formData,
       images: [cleanImage],
       colors: cleanColors.length > 0 ? cleanColors : ["Default"],
+      specifications: cleanSpecifications,
       subcategory: formData.subcategory || undefined,
       reviews: formData.reviews.trim() ? Number(formData.reviews) : undefined,
     };
@@ -545,6 +577,21 @@ function ProductManagement() {
     const newColors = [...formData.colors];
     newColors[index] = value;
     setFormData({...formData, colors: newColors});
+  };
+  const addSpecification = () =>
+    setFormData({
+      ...formData,
+      specifications: [...formData.specifications, { label: "", value: "", icon: "display" }],
+    });
+  const removeSpecification = (index: number) =>
+    setFormData({
+      ...formData,
+      specifications: formData.specifications.filter((_, i) => i !== index),
+    });
+  const updateSpecification = (index: number, key: keyof ProductSpecForm, value: string) => {
+    const nextSpecifications = [...formData.specifications];
+    nextSpecifications[index] = { ...nextSpecifications[index], [key]: value };
+    setFormData({ ...formData, specifications: nextSpecifications });
   };
 
   const filteredProducts = products.filter((product) => {
@@ -720,6 +767,51 @@ function ProductManagement() {
                   </div>
                 ))}
                 <button type="button" onClick={addColor} className="text-sm text-primary">+ Add Color</button>
+              </div>
+              <div>
+                <label className="mb-2 block text-sm font-medium">Specifications / Features</label>
+                <div className="space-y-2">
+                  {formData.specifications.map((spec, index) => (
+                    <div key={`spec-${index}`} className="grid grid-cols-12 gap-2">
+                      <select
+                        value={spec.icon}
+                        onChange={(e) => updateSpecification(index, "icon", e.target.value)}
+                        className="col-span-4 rounded-lg bg-secondary px-2 py-2 text-sm"
+                      >
+                        {productSpecIconOptions.map((iconName) => (
+                          <option key={iconName} value={iconName}>
+                            {iconName}
+                          </option>
+                        ))}
+                      </select>
+                      <input
+                        type="text"
+                        placeholder="Label"
+                        value={spec.label}
+                        onChange={(e) => updateSpecification(index, "label", e.target.value)}
+                        className="col-span-3 rounded-lg bg-secondary px-3 py-2"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Value"
+                        value={spec.value}
+                        onChange={(e) => updateSpecification(index, "value", e.target.value)}
+                        className="col-span-4 rounded-lg bg-secondary px-3 py-2"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeSpecification(index)}
+                        className="col-span-1 p-2 text-destructive"
+                        disabled={formData.specifications.length === 1}
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <button type="button" onClick={addSpecification} className="mt-2 text-sm text-primary">
+                  + Add Specification
+                </button>
               </div>
 
               <div className="flex items-center gap-4">

@@ -6,11 +6,21 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
   Share2,
-  ShoppingCart,
   Minus,
   Plus,
   ChevronDown,
   ChevronUp,
+  MonitorSmartphone,
+  Cpu,
+  Camera,
+  BatteryCharging,
+  Wifi,
+  Bluetooth,
+  HardDrive,
+  MemoryStick,
+  ShieldCheck,
+  Speaker,
+  Zap,
 } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
 import { useStore } from "@/contexts/StoreContext";
@@ -52,8 +62,7 @@ export function ProductDetailPage() {
   };
 
   const handleBuyNow = () => {
-    handleAddToCart();
-    navigate("/cart");
+    navigate(`/buy/${product.id}?qty=${quantity}&color=${encodeURIComponent(selectedColor)}`);
   };
 
   const handleWhatsAppShare = () => {
@@ -68,6 +77,41 @@ export function ProductDetailPage() {
 
   const visibleColors = showAllColors ? product.colors : product.colors.slice(0, 4);
   const hasMoreColors = product.colors.length > 4;
+  const colorPaletteByName: Record<string, string> = {
+    black: "#3f3f46",
+    white: "#e5e7eb",
+    silver: "#c9ced6",
+    gray: "#9ca3af",
+    grey: "#9ca3af",
+    blue: "#7aa9ff",
+    purple: "#b7a8ff",
+    violet: "#a78bfa",
+    gold: "#d4b06a",
+    yellow: "#facc15",
+    desert: "#d4c9c8",
+    natural: "#d8d6d0",
+    titanium: "#b7b4b4",
+    starlight: "#efe3c8",
+  };
+  const getColorCircle = (colorName: string) => {
+    const lowered = colorName.toLowerCase();
+    const matchedKey = Object.keys(colorPaletteByName).find((key) => lowered.includes(key));
+    return matchedKey ? colorPaletteByName[matchedKey] : "#d1d5db";
+  };
+  const specIconMap = {
+    display: MonitorSmartphone,
+    cpu: Cpu,
+    camera: Camera,
+    battery: BatteryCharging,
+    wifi: Wifi,
+    bluetooth: Bluetooth,
+    storage: HardDrive,
+    memory: MemoryStick,
+    shield: ShieldCheck,
+    speaker: Speaker,
+    zap: Zap,
+  } as const;
+  const specificationItems = product.specifications || [];
 
   return (
     <div className="min-h-screen bg-background pb-32">
@@ -76,13 +120,13 @@ export function ProductDetailPage() {
         <div className="mx-auto flex w-full max-w-330 items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           <button
             onClick={() => navigate(-1)}
-            className="p-2 hover:bg-secondary rounded-full transition-colors"
+            className="p-2 text-foreground"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
           <button
             onClick={() => setShowShare(!showShare)}
-            className="p-2 hover:bg-secondary rounded-full transition-colors"
+            className="p-2 text-foreground"
           >
             <Share2 className="w-5 h-5" />
           </button>
@@ -138,60 +182,69 @@ export function ProductDetailPage() {
 
           {/* Product Info */}
           <div className="px-4 py-4 lg:px-0 lg:py-0">
-            {/* Brand Name (Optional) */}
-            {product.brand && (
-              <p className="text-sm text-muted-foreground mb-1">{product.brand}</p>
-            )}
-
             {/* Product Name */}
             <h1 className="text-xl font-bold text-foreground mb-3 lg:text-3xl">{product.name}</h1>
-
-            {/* Price Section */}
-            <div className="flex items-center gap-3 mb-4 lg:mb-6">
-              <span className="text-2xl font-bold text-price-original lg:text-3xl">
-                ${product.price.toFixed(2)}
-              </span>
-              {product.originalPrice > product.price && (
-                <span className="text-base text-price-discounted line-through lg:text-lg">
-                  ${product.originalPrice.toFixed(2)}
+            {product.discountPercent > 0 ? (
+              <div className="mb-3">
+                <span className="inline-flex rounded-full bg-primary px-2.5 py-1 text-xs font-semibold text-primary-foreground">
+                  {product.discountPercent}% OFF
                 </span>
-              )}
-            </div>
+              </div>
+            ) : null}
 
-            {/* Quantity Selector */}
-            <div className="flex items-center gap-4 mb-6">
-              <span className="text-sm font-medium text-foreground">Quantity</span>
-              <div className="flex items-center gap-3 bg-secondary rounded-lg p-1">
+            {/* Price + Quantity Section */}
+            <div className="mb-4 flex items-center justify-between gap-3 lg:mb-6">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl font-bold text-price-original lg:text-3xl">
+                  ${product.price.toFixed(2)}
+                </span>
+                {product.originalPrice > product.price && (
+                  <span className="text-base text-price-discounted line-through lg:text-lg">
+                    ${product.originalPrice.toFixed(2)}
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-3">
                 <button
                   onClick={decrementQuantity}
-                  className="p-2 hover:bg-background rounded transition-colors"
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-secondary"
                 >
-                  <Minus className="w-4 h-4" />
+                  <Minus className="h-4 w-4" />
                 </button>
-                <span className="w-8 text-center font-semibold">{quantity}</span>
+                <span className="w-6 text-center text-sm">{quantity}</span>
                 <button
                   onClick={incrementQuantity}
-                  className="p-2 hover:bg-background rounded transition-colors"
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-border text-primary transition-colors hover:bg-primary/10"
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus className="h-4 w-4" />
                 </button>
               </div>
             </div>
+            {product.brand ? (
+              <p className="mb-4 text-sm font-medium lg:mb-6">
+                <span className="text-muted-foreground">By </span>
+                <span className="text-foreground">{product.brand}</span>
+              </p>
+            ) : null}
 
             {/* Color Selection */}
             <div className="mb-6">
               <h3 className="text-sm font-medium text-foreground mb-3">Color</h3>
-              <div className="flex flex-wrap gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 {visibleColors.map((color, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedColor(color)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    className={`flex w-full items-center gap-2 rounded-full border px-3 py-2 text-sm font-medium transition-colors ${
                       selectedColor === color
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-secondary text-foreground hover:bg-secondary/80"
+                        ? "border-primary bg-primary/5 text-muted-foreground"
+                        : "border-border bg-secondary/35 text-muted-foreground hover:border-primary/40"
                     }`}
                   >
+                    <span
+                      className="h-6 w-6 rounded-full border border-border/70"
+                      style={{ backgroundColor: getColorCircle(color) }}
+                    />
                     {color}
                   </button>
                 ))}
@@ -216,6 +269,27 @@ export function ProductDetailPage() {
               )}
             </div>
 
+            {specificationItems.length > 0 ? (
+              <div className="mb-6">
+                <h3 className="mb-3 text-sm font-medium text-foreground">A Snapshot View</h3>
+                <div className="space-y-2 rounded-2xl border border-border/70 bg-card p-4">
+                  {specificationItems.map((item, index) => {
+                    const Icon = specIconMap[(item.icon as keyof typeof specIconMap) || "display"] || MonitorSmartphone;
+                    return (
+                      <div key={`${item.label}-${index}`} className="flex items-center gap-3">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary text-muted-foreground">
+                          <Icon className="h-4 w-4" />
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          <span className="font-medium text-foreground">{item.label}:</span> {item.value}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : null}
+
             {/* Description */}
             <div className="mb-6">
               <h3 className="text-sm font-medium text-foreground mb-2">Description</h3>
@@ -234,7 +308,7 @@ export function ProductDetailPage() {
           </div>
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide lg:grid lg:grid-cols-4 lg:gap-4 lg:overflow-visible">
             {relatedProducts.slice(0, 6).map((relatedProduct) => (
-              <div key={relatedProduct.id} className="w-40 shrink-0 lg:w-auto lg:shrink">
+              <div key={relatedProduct.id} className="w-48 shrink-0 lg:w-auto lg:shrink">
                 <ProductCard product={relatedProduct} compact />
               </div>
             ))}
@@ -244,7 +318,7 @@ export function ProductDetailPage() {
       )}
 
       {/* Fixed Bottom Actions */}
-      <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border p-4 z-40 md:pb-20">
+      <div className="fixed bottom-0 left-0 right-0 p-4 z-40 md:pb-20">
         <div className="mx-auto w-full max-w-330 relative">
           <button
             onClick={handleWhatsAppShare}
@@ -255,17 +329,16 @@ export function ProductDetailPage() {
           </button>
           <div className="flex gap-3">
             <button
-              onClick={handleAddToCart}
-              className="flex-1 flex items-center justify-center gap-2 bg-secondary text-foreground py-3 rounded-lg font-semibold hover:bg-secondary/80 transition-colors"
-            >
-              <ShoppingCart className="w-5 h-5" />
-              Add to Cart
-            </button>
-            <button
               onClick={handleBuyNow}
-              className="flex-1 bg-primary text-primary-foreground py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+              className="flex-1 rounded-full border border-primary bg-background py-3 text-sm font-medium text-primary transition-colors hover:bg-primary/5"
             >
               Buy Now
+            </button>
+            <button
+              onClick={handleAddToCart}
+              className="flex-1 rounded-full bg-primary py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            >
+              Add to Cart
             </button>
           </div>
         </div>

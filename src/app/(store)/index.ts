@@ -12,3 +12,4 @@ export { OffersPage } from "./offers/OffersPage";
 export { MorePage } from "./more/MorePage";
 export { ChatPage } from "./chat/ChatPage";
 export { ScanPage } from "./scan/ScanPage";
+export { NotificationsPage } from "./notifications/NotificationsPage";

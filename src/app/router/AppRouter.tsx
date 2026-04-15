@@ -20,6 +20,8 @@ import { OffersPage } from "@/app/(store)/offers/OffersPage";
 import { MorePage } from "@/app/(store)/more/MorePage";
 import { FlashDealsPage } from "@/app/(store)/flash-deals/FlashDealsPage";
 import { FreeDeliveryPage } from "@/app/(store)/free-delivery/FreeDeliveryPage";
+import { BuyNowPage } from "@/app/(store)/buy-now/BuyNowPage";
+import { NotificationsPage } from "@/app/(store)/notifications/NotificationsPage";
 import { NotFoundPage } from "@/shared/pages/NotFoundPage";
 
 const router = createBrowserRouter([
@@ -44,6 +46,8 @@ const router = createBrowserRouter([
       { path: "flash-deals", element: <FlashDealsPage /> },
       { path: "free-delivery", element: <FreeDeliveryPage /> },
       { path: "more", element: <MorePage /> },
+      { path: "buy/:id", element: <BuyNowPage /> },
+      { path: "notifications", element: <NotificationsPage /> },
     ],
   },
   {
