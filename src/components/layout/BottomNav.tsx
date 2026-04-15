@@ -36,6 +36,7 @@ export function BottomNav() {
           const Icon = item.icon;
           const isScan = item.label === "Scan";
           const isHome = item.label === "Home";
+          const isOffer = item.label === "Offer";
           return (
             <Link
               key={item.href}
@@ -57,8 +58,8 @@ export function BottomNav() {
                 </>
               ) : (
                 <>
-                  <div className="relative">
-                    <Icon className={`h-6 w-6 ${active ? "fill-current" : ""}`} />
+                  <div className={`relative ${isOffer && active ? "rounded-full bg-primary p-1" : ""}`}>
+                    <Icon className={isOffer && active ? "h-6 w-6 text-white" : `h-6 w-6 ${active ? "fill-current" : ""}`} />
                     {isHome && active && (
                       <span className="absolute bottom-[3px] left-1/2 h-[9px] w-[6px] -translate-x-1/2 rounded-sm bg-background" />
                     )}
