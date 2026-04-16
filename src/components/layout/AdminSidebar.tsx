@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import {
   LayoutDashboard,
   Package,
@@ -40,20 +40,20 @@ interface MenuGroup {
 
 export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const [searchParams] = useSearchParams();
-  const activeTab = searchParams.get("tab") || "dashboard";
+  const location = useLocation();
+  const pathSegment = location.pathname.split("/").filter(Boolean).pop() || "";
 
-  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
-    sliders: true,
-    categories: true,
-    products: true,
-    flashDeals: true,
-    orders: true,
-    customers: true,
-    delivery: true,
-  });
+  // Prefer query param `tab` (used in AdminDashboardPage).
+  // Fallback to path segment (for pages like `/admin/orders`) so active colors keep working.
+  const activeTab = searchParams.get("tab") || pathSegment || "dashboard";
 
-  const toggleMenu = (key: string) => {
-    setOpenMenus((prev) => ({ ...prev, [key]: !prev[key] }));
+  // Only auto-expand the active group by default.
+  // If the user explicitly toggles a group, we respect that choice.
+  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
+
+  const toggleMenu = (key: string, currentOpen: boolean) => {
+    // Respect the current visual state so a single click collapses/expands immediately.
+    setOpenMenus((prev) => ({ ...prev, [key]: !currentOpen }));
   };
 
   const isActiveTab = (tab: string | undefined): boolean => {
@@ -155,7 +155,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
             <Link
             to={href}
             onClick={onClose}
-            className={`relative flex items-center gap-3 rounded-xl border px-3.5 py-3 text-sm font-medium shadow-[0_1px_2px_rgba(15,23,42,0.05)] transition-colors ${
+            className={`relative flex items-center gap-3 rounded-xl border px-3.5 py-3 text-sm font-medium shadow-[0_1px_2px_rgba(15,23,42,0.05)] transition-colors duration-200 transform-gpu focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 ${
               active
                 ? "border-primary/35 bg-primary/12 text-primary shadow-sm"
                 : "border-slate-200/80 bg-white/75 text-slate-600 hover:border-slate-300 hover:bg-white hover:text-slate-900"
@@ -177,16 +177,17 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
     }
 
     // Menu group with submenu
-    const isOpen = openMenus[groupKey] || false;
     const isActive = isGroupActive(item.children);
+    const isExplicitlyToggled = typeof openMenus[groupKey] === "boolean";
+    const isOpen = isExplicitlyToggled ? openMenus[groupKey] : isActive;
 
     return (
       <li key={groupKey}>
         <motion.button
-          onClick={() => toggleMenu(groupKey)}
+          onClick={() => toggleMenu(groupKey, isOpen)}
           whileHover={{ x: 2 }}
           transition={{ duration: 0.18 }}
-          className={`flex w-full items-center justify-between gap-3 rounded-xl border px-3.5 py-3 text-sm font-medium shadow-[0_1px_2px_rgba(15,23,42,0.05)] transition-colors ${
+          className={`flex w-full items-center justify-between gap-3 rounded-xl border px-3.5 py-3 text-sm font-medium shadow-[0_1px_2px_rgba(15,23,42,0.05)] transition-colors duration-200 transform-gpu focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 ${
             isActive
               ? "border-primary/35 bg-primary/12 text-primary shadow-sm"
               : "border-slate-200/80 bg-white/75 text-slate-600 hover:border-slate-300 hover:bg-white hover:text-slate-900"
@@ -212,7 +213,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.22, ease: "easeOut" }}
-              className="ml-8 mt-2 space-y-1.5 overflow-hidden border-l-2 border-slate-200/90 pl-3.5"
+              className="ml-6 mt-2 space-y-1.5 overflow-hidden border-l border-slate-200/70 pl-4"
             >
               {item.children!.map((child) => {
                 const childActive = isActiveTab(child.tab);
@@ -222,7 +223,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                       <Link
                         to={`${item.href}?tab=${child.tab}`}
                         onClick={onClose}
-                        className={`flex items-center gap-3 rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
+                        className={`flex items-center gap-3 rounded-lg border px-3 py-2 text-sm font-medium transition-colors duration-200 transform-gpu focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25 ${
                           childActive
                             ? "border-primary/35 bg-primary/12 text-primary"
                             : "border-slate-200/70 bg-white/75 text-slate-500 hover:border-slate-300 hover:bg-white hover:text-slate-700"
@@ -256,14 +257,17 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         initial={false}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.2 }}
-        className={`fixed left-0 top-0 z-50 flex h-full w-72 flex-col border-r border-slate-200/80 bg-linear-to-b from-white via-slate-50 to-slate-100/70 shadow-[0_12px_32px_rgba(15,23,42,0.08)] transition-transform duration-300 ease-out lg:sticky lg:z-20 lg:translate-x-0 lg:shadow-none ${
+        className={`fixed left-0 top-0 z-50 flex h-full w-64 flex-col border-r border-slate-200/80 bg-gradient-to-b from-white via-slate-50/70 to-slate-100/55 shadow-[0_12px_32px_rgba(15,23,42,0.08)] backdrop-blur-xl transition-transform duration-300 ease-out lg:sticky lg:z-20 lg:translate-x-0 lg:shadow-none ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* Logo */}
-        <div className="border-b border-slate-200/80 bg-white/70 px-6 py-5 backdrop-blur">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">ReadMart</p>
-          <h1 className="mt-1.5 text-lg font-bold text-slate-900">Admin Dashboard</h1>
+        <div className="relative border-b border-slate-200/80 bg-white/70 px-6 py-5 backdrop-blur-xl">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.18),transparent_55%),radial-gradient(circle_at_bottom_right,rgba(56,189,248,0.14),transparent_45%)]" />
+          <div className="relative">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">ReadMart</p>
+            <h1 className="mt-1.5 text-lg font-bold text-slate-900">Admin Dashboard</h1>
+          </div>
         </div>
 
         {/* Navigation */}
@@ -274,10 +278,10 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         </nav>
 
         {/* Logout */}
-        <div className="border-t border-slate-200/80 bg-white/70 p-4">
+        <div className="border-t border-slate-200/80 bg-white/70 p-4 backdrop-blur-xl">
           <Link
             to="/admin"
-            className="flex w-full items-center gap-3 rounded-xl border border-transparent px-3.5 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:border-slate-200/80 hover:bg-white/85 hover:text-slate-900"
+            className="flex w-full items-center gap-3 rounded-2xl border border-transparent px-3.5 py-2.5 text-sm font-semibold text-slate-600 transition-colors duration-200 transform-gpu hover:border-slate-200/80 hover:bg-white/85 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25"
           >
             <LogOut className="w-5 h-5" />
             <span>Logout</span>

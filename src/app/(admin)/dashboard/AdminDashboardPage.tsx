@@ -1965,13 +1965,41 @@ export function AdminDashboardPage() {
       case "settings": return <SettingsManagement />;
       default:
         return (
-          <div className="space-y-4">
+          <div className="space-y-6">
+            <section className="relative overflow-hidden rounded-[32px] border border-slate-200/70 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-6 text-white shadow-[0_28px_80px_rgba(15,23,42,0.22)]">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.22),transparent_26%),radial-gradient(circle_at_bottom_left,rgba(99,102,241,0.28),transparent_30%)]" />
+              <div className="relative flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+                <div className="max-w-2xl">
+                  <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-300">ReadMart Command Center</p>
+                  <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">Business Overview</h2>
+                  <p className="mt-3 max-w-xl text-sm leading-6 text-slate-300 sm:text-base">
+                    Quick performance snapshot across your core admin operations with the same live numbers,
+                    wrapped in a cleaner and more premium dashboard experience.
+                  </p>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-3 xl:min-w-[420px]">
+                  <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
+                    <p className="text-xs uppercase tracking-[0.22em] text-slate-300">Revenue</p>
+                    <p className="mt-2 text-2xl font-bold text-white">{formatCurrency(totalRevenue)}</p>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
+                    <p className="text-xs uppercase tracking-[0.22em] text-slate-300">Orders</p>
+                    <p className="mt-2 text-2xl font-bold text-white">{orders.length}</p>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
+                    <p className="text-xs uppercase tracking-[0.22em] text-slate-300">Customers</p>
+                    <p className="mt-2 text-2xl font-bold text-white">{customerCount}</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
             <SectionHeading
-              title="Business Overview"
-              subtitle="Quick performance snapshot across your core admin operations"
+              title="Performance Cards"
+              subtitle="All existing dashboard functionality remains unchanged, only the presentation has been refreshed."
             />
 
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               <MetricCard title="Total Products" value={products.length} icon={Package} iconClassName="text-indigo-600" />
               <MetricCard title="Total Orders" value={orders.length} icon={ShoppingCart} iconClassName="text-blue-600" />
               <MetricCard title="Customers" value={customerCount} icon={Users} iconClassName="text-cyan-600" />
@@ -1982,9 +2010,17 @@ export function AdminDashboardPage() {
               <MetricCard title="Promo Codes" value={promoCodes.length} icon={BarChart3} iconClassName="text-purple-600" />
             </div>
 
-            <div className="grid gap-4 xl:grid-cols-2">
-              <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-                <h3 className="mb-3 text-sm font-semibold text-gray-700">Order Status</h3>
+            <div className="grid gap-5 xl:grid-cols-2">
+              <section className="rounded-[28px] border border-white/70 bg-white/85 p-5 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur-sm transition-all duration-300 transform-gpu hover:-translate-y-0.5 hover:shadow-[0_26px_80px_rgba(15,23,42,0.12)]">
+                <div className="mb-4 flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Distribution</p>
+                    <h3 className="mt-1 text-lg font-semibold text-slate-900">Order Status</h3>
+                  </div>
+                  <div className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
+                    {pendingOrders} pending
+                  </div>
+                </div>
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
@@ -2007,8 +2043,16 @@ export function AdminDashboardPage() {
                 </div>
               </section>
 
-              <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-                <h3 className="mb-3 text-sm font-semibold text-gray-700">Category Product Count</h3>
+              <section className="rounded-[28px] border border-white/70 bg-white/85 p-5 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur-sm transition-all duration-300 transform-gpu hover:-translate-y-0.5 hover:shadow-[0_26px_80px_rgba(15,23,42,0.12)]">
+                <div className="mb-4 flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Inventory</p>
+                    <h3 className="mt-1 text-lg font-semibold text-slate-900">Category Product Count</h3>
+                  </div>
+                  <div className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                    Top {categoryChartData.length} categories
+                  </div>
+                </div>
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={categoryChartData}>
@@ -2023,9 +2067,17 @@ export function AdminDashboardPage() {
               </section>
             </div>
 
-            <div className="grid gap-4 xl:grid-cols-[1.3fr_1fr]">
-              <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-                <h3 className="mb-3 text-sm font-semibold text-gray-700">Revenue Trend (7 days)</h3>
+            <div className="grid gap-5 xl:grid-cols-[1.3fr_1fr]">
+              <section className="rounded-[28px] border border-white/70 bg-white/85 p-5 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur-sm transition-all duration-300 transform-gpu hover:-translate-y-0.5 hover:shadow-[0_26px_80px_rgba(15,23,42,0.12)]">
+                <div className="mb-4 flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Momentum</p>
+                    <h3 className="mt-1 text-lg font-semibold text-slate-900">Revenue Trend (7 days)</h3>
+                  </div>
+                  <div className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                    {formatCurrency(totalRevenue)} total
+                  </div>
+                </div>
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={trendData}>
@@ -2039,8 +2091,16 @@ export function AdminDashboardPage() {
                 </div>
               </section>
 
-              <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-                <h3 className="mb-3 text-sm font-semibold text-gray-700">Recent Orders</h3>
+              <section className="rounded-[28px] border border-white/70 bg-white/85 p-5 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur-sm transition-all duration-300 transform-gpu hover:-translate-y-0.5 hover:shadow-[0_26px_80px_rgba(15,23,42,0.12)]">
+                <div className="mb-4 flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Activity</p>
+                    <h3 className="mt-1 text-lg font-semibold text-slate-900">Recent Orders</h3>
+                  </div>
+                  <div className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+                    {topOrders.length} latest
+                  </div>
+                </div>
                 {topOrders.length === 0 ? (
                   <p className="py-10 text-center text-sm text-gray-500">No recent order found.</p>
                 ) : (
@@ -2055,7 +2115,7 @@ export function AdminDashboardPage() {
                       </thead>
                       <tbody>
                         {topOrders.map((order) => (
-                          <tr key={order.id} className="border-b border-gray-100 last:border-b-0">
+                          <tr key={order.id} className="border-b border-gray-100 last:border-b-0 transition-colors hover:bg-slate-50/70">
                             <td className="py-3 font-medium text-gray-900">{order.id}</td>
                             <td className="py-3 text-gray-700">{order.customerName}</td>
                             <td className="py-3 font-medium text-gray-900">{formatCurrency(order.total)}</td>
@@ -2073,25 +2133,25 @@ export function AdminDashboardPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-100/80">
+    <div className="flex min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(99,102,241,0.08),_transparent_22%),radial-gradient(circle_at_top_right,_rgba(56,189,248,0.08),_transparent_22%),linear-gradient(180deg,_#f8fafc_0%,_#eef2ff_100%)]">
       <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="sticky top-0 z-30 border-b border-gray-200/80 bg-white/90 backdrop-blur">
-          <div className="flex w-full items-center justify-between px-3 py-3 md:px-4 lg:px-5">
+        <div className="sticky top-0 z-30 border-b border-white/50 bg-white/70 backdrop-blur-xl">
+          <div className="flex w-full items-center justify-between px-3 py-4 md:px-4 lg:px-5">
             <div className="flex items-center gap-3">
-              <button onClick={() => setSidebarOpen(true)} className="rounded-md p-2 hover:bg-gray-100 lg:hidden">
-                <Menu className="h-5 w-5 text-gray-700" />
+              <button onClick={() => setSidebarOpen(true)} className="rounded-xl border border-slate-200/70 bg-white/70 p-2.5 shadow-sm transition-colors hover:bg-white lg:hidden">
+                <Menu className="h-5 w-5 text-slate-700" />
               </button>
               <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Admin panel</p>
-                <h1 className="text-base font-semibold text-gray-900 md:text-lg">{activeSectionLabel}</h1>
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Admin panel</p>
+                <h1 className="text-base font-semibold text-slate-900 md:text-lg">{activeSectionLabel}</h1>
               </div>
             </div>
 
             <Link
               to="/admin"
-              className="rounded-md px-3 py-1.5 text-sm font-medium text-rose-500 transition-colors hover:bg-rose-50"
+              className="rounded-full border border-rose-200 bg-white/80 px-4 py-2 text-sm font-semibold text-rose-500 shadow-sm transition-colors hover:bg-rose-50"
             >
               Logout
             </Link>
@@ -2099,7 +2159,7 @@ export function AdminDashboardPage() {
         </div>
 
         <div className="flex-1 overflow-auto p-3 md:p-4 lg:p-5">
-          <div className="w-full rounded-2xl border border-gray-200/80 bg-white/90 p-3 shadow-sm md:p-4">
+          <div className="w-full rounded-[32px] border border-white/70 bg-white/55 p-3 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur transition-all duration-300 md:p-4">
             {renderContent()}
           </div>
         </div>

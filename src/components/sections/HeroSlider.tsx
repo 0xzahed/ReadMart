@@ -37,7 +37,7 @@ export function HeroSlider() {
 
   return (
     <section className="relative w-full overflow-hidden pt-3 md:pt-4 lg:pt-6">
-      <div className="mx-auto w-full max-w-480 px-2 sm:px-4 lg:px-8">
+      <div className="mx-auto w-full px-2 sm:px-4 lg:px-8 md:max-w-[480px]">
         <Carousel
           setApi={setApi}
           opts={{ align: "start", loop: true }}
