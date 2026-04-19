@@ -23,6 +23,7 @@ import { AnimatePresence, motion } from "framer-motion";
 interface AdminSidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  onLogout?: () => void;
 }
 
 interface SubMenuItem {
@@ -38,7 +39,7 @@ interface MenuGroup {
   children?: SubMenuItem[];
 }
 
-export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
+export function AdminSidebar({ isOpen, onClose, onLogout }: AdminSidebarProps) {
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const pathSegment = location.pathname.split("/").filter(Boolean).pop() || "";
@@ -123,6 +124,12 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         { label: "Customers", tab: "customers" },
         { label: "Customer List", tab: "customer-list" },
       ],
+    },
+    {
+      icon: Users,
+      label: "Manage Admins",
+      href: "/admin/manage-admins",
+      tab: "manage-admins",
     },
     {
       icon: Tags,
@@ -257,7 +264,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         initial={false}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.2 }}
-        className={`fixed left-0 top-0 z-50 flex h-full w-64 flex-col border-r border-slate-200/80 bg-gradient-to-b from-white via-slate-50/70 to-slate-100/55 shadow-[0_12px_32px_rgba(15,23,42,0.08)] backdrop-blur-xl transition-transform duration-300 ease-out lg:sticky lg:z-20 lg:translate-x-0 lg:shadow-none ${
+        className={`fixed left-0 top-0 z-50 flex h-full w-64 flex-col border-r border-slate-200/80 bg-linear-to-b from-white via-slate-50/70 to-slate-100/55 shadow-[0_12px_32px_rgba(15,23,42,0.08)] backdrop-blur-xl transition-transform duration-300 ease-out lg:sticky lg:z-20 lg:translate-x-0 lg:shadow-none ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -279,13 +286,28 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
 
         {/* Logout */}
         <div className="border-t border-slate-200/80 bg-white/70 p-4 backdrop-blur-xl">
-          <Link
-            to="/admin"
-            className="flex w-full items-center gap-3 rounded-2xl border border-transparent px-3.5 py-2.5 text-sm font-semibold text-slate-600 transition-colors duration-200 transform-gpu hover:border-slate-200/80 hover:bg-white/85 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25"
-          >
-            <LogOut className="w-5 h-5" />
-            <span>Logout</span>
-          </Link>
+          {onLogout ? (
+            <button
+              type="button"
+              onClick={() => {
+                onLogout();
+                onClose();
+              }}
+              className="flex w-full items-center gap-3 rounded-2xl border border-transparent px-3.5 py-2.5 text-sm font-semibold text-slate-600 transition-colors duration-200 transform-gpu hover:border-slate-200/80 hover:bg-white/85 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25"
+            >
+              <LogOut className="w-5 h-5" />
+              <span>Logout</span>
+            </button>
+          ) : (
+            <Link
+              to="/admin"
+              onClick={onClose}
+              className="flex w-full items-center gap-3 rounded-2xl border border-transparent px-3.5 py-2.5 text-sm font-semibold text-slate-600 transition-colors duration-200 transform-gpu hover:border-slate-200/80 hover:bg-white/85 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25"
+            >
+              <LogOut className="w-5 h-5" />
+              <span>Logout</span>
+            </Link>
+          )}
         </div>
       </motion.aside>
     </>

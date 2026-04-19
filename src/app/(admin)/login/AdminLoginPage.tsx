@@ -13,7 +13,7 @@ type LocationState = {
 export function AdminLoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAdminAuthenticated, login } = useAdminAuth();
+  const { isAdminAuthenticated, login, isLoading } = useAdminAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,13 +25,13 @@ export function AdminLoginPage() {
 
   const from = (location.state as LocationState | null)?.from;
 
-  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const ok = login(email, password);
+    const result = await login(email, password);
 
-    if (!ok) {
-      setError("Email and password are required.");
+    if (!result.ok) {
+      setError(result.message || "Unable to login with these credentials.");
       return;
     }
 
@@ -57,9 +57,12 @@ export function AdminLoginPage() {
             <label className="text-sm font-medium text-foreground">Email</label>
             <Input
               className="mt-1"
+              type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               placeholder="admin@readmart.com"
+              autoComplete="email"
+              disabled={isLoading}
             />
           </div>
           <div>
@@ -70,12 +73,15 @@ export function AdminLoginPage() {
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 placeholder="Enter admin password"
+                autoComplete="current-password"
+                disabled={isLoading}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                 aria-label={showPassword ? "Hide password" : "Show password"}
+                disabled={isLoading}
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
@@ -84,8 +90,12 @@ export function AdminLoginPage() {
 
           {error ? <p className="text-sm font-medium text-destructive">{error}</p> : null}
 
-          <Button className="h-11 w-full rounded-xl text-base font-semibold" type="submit">
-            Login to Admin
+          <Button
+            className="h-11 w-full rounded-xl text-base font-semibold"
+            type="submit"
+            disabled={isLoading}
+          >
+            {isLoading ? "Logging in..." : "Login to Admin"}
           </Button>
         </form>
 

@@ -3,6 +3,7 @@ import { Navigate, RouterProvider, createBrowserRouter, Outlet } from "react-rou
 import { StoreLayout } from "@/app/layouts/StoreLayout";
 import { AdminDashboardPage } from "@/app/(admin)/dashboard/AdminDashboardPage";
 import { AdminLoginPage } from "@/app/(admin)/login/AdminLoginPage";
+import { AdminManageAdminsPage } from "@/app/(admin)/manage-admins/AdminManageAdminsPage";
 import { CartPage } from "@/app/(store)/cart/CartPage";
 import { ExplorePage } from "@/app/(store)/explore/ExplorePage";
 import { HomePage } from "@/app/(store)/home/HomePage";
@@ -22,6 +23,7 @@ import { FlashDealsPage } from "@/app/(store)/flash-deals/FlashDealsPage";
 import { FreeDeliveryPage } from "@/app/(store)/free-delivery/FreeDeliveryPage";
 import { BuyNowPage } from "@/app/(store)/buy-now/BuyNowPage";
 import { NotificationsPage } from "@/app/(store)/notifications/NotificationsPage";
+import { RequireAdmin } from "@/components/layout/RequireAdmin";
 import { NotFoundPage } from "@/shared/pages/NotFoundPage";
 
 const router = createBrowserRouter([
@@ -55,8 +57,20 @@ const router = createBrowserRouter([
     element: <AdminLoginPage />,
   },
   {
+    path: "/admin/manage-admins",
+    element: (
+      <RequireAdmin>
+        <AdminManageAdminsPage />
+      </RequireAdmin>
+    ),
+  },
+  {
     path: "/admin/*",
-    element: <AdminDashboardPage />,
+    element: (
+      <RequireAdmin>
+        <AdminDashboardPage />
+      </RequireAdmin>
+    ),
   },
   {
     path: "/auth/signin",

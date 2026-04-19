@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ChangeEvent } from "react";
-import { Link, useLocation, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import Image from "next/image";
 import {
   Plus,
@@ -20,9 +20,14 @@ import {
   CheckCircle2,
   Ban,
 } from "lucide-react";
-import { useStore, Slider, Category, Product, PromoCode, FlashDeal, Order } from "@/contexts/StoreContext";
+import { useStore, Slider, Category, PromoCode, FlashDeal, Order } from "@/contexts/StoreContext";
+import { useAdminAuth } from "@/contexts/AdminAuthContext";
 import { toast } from "sonner";
 import { AdminSidebar } from "@/components/layout/AdminSidebar";
+import { AdminBannerPage } from "@/app/(admin)/banner/AdminBannerPage";
+import { AdminCategoryPage } from "@/app/(admin)/category/AdminCategoryPage";
+import { AdminProductsPage } from "@/app/(admin)/products/AdminProductsPage";
+import { AdminSubCategoryPage } from "@/app/(admin)/subcategory/AdminSubCategoryPage";
 import { SectionHeading } from "@/components/admin/SectionHeading";
 import { MetricCard } from "@/components/admin/MetricCard";
 import {
@@ -454,375 +459,6 @@ function CategoryManagement() {
               <div className="flex gap-3">
                 <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-2 bg-secondary rounded-lg">Cancel</button>
                 <button type="submit" className="flex-1 py-2 bg-primary text-white rounded-lg">{editingCategory ? "Update" : "Add"}</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// Product Management Component
-function ProductManagement() {
-  const { products, categories, addProduct, updateProduct, deleteProduct } = useStore();
-  const [showModal, setShowModal] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [searchText, setSearchText] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("all");
-  type ProductSpecForm = { label: string; value: string; icon: string };
-  const [formData, setFormData] = useState({
-    name: "", price: 0, originalPrice: 0, images: [""], category: "",
-    brand: "", rating: 0, reviews: "", description: "", colors: [""],
-    specifications: [{ label: "", value: "", icon: "display" }] as ProductSpecForm[],
-    barcode: "", subcategory: "", inStock: true, isFlashDeal: false, discountPercent: 0,
-  });
-
-  const handleOpenModal = (product?: Product) => {
-    if (product) {
-      setEditingProduct(product);
-      setFormData({
-        name: product.name, price: product.price, originalPrice: product.originalPrice,
-        images: product.images, category: product.category, brand: product.brand || "",
-        rating: product.rating, reviews: product.reviews ? String(product.reviews) : "", description: product.description,
-        colors: product.colors, barcode: product.barcode || "", subcategory: product.subcategory || "", inStock: product.inStock,
-        specifications:
-          product.specifications && product.specifications.length > 0
-            ? product.specifications.map((spec) => ({
-                label: spec.label,
-                value: spec.value,
-                icon: spec.icon || "display",
-              }))
-            : [{ label: "", value: "", icon: "display" }],
-        isFlashDeal: product.isFlashDeal, discountPercent: product.discountPercent,
-      });
-    } else {
-      setEditingProduct(null);
-      const defaultCategoryId = categories[0]?.id || "";
-      const defaultSubcategory = categories.find((category) => category.id === defaultCategoryId)?.subcategories?.[0] || "";
-      setFormData({
-        name: "", price: 0, originalPrice: 0, images: [""], category: defaultCategoryId,
-        brand: "", rating: 0, reviews: "", description: "", colors: [""],
-        specifications: [{ label: "", value: "", icon: "display" }],
-        barcode: "", subcategory: defaultSubcategory, inStock: true, isFlashDeal: false, discountPercent: 0,
-      });
-    }
-    setShowModal(true);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const cleanImage = formData.images[0]?.trim();
-    const cleanColors = formData.colors.map((color) => color.trim()).filter(Boolean);
-    const cleanSpecifications = formData.specifications
-      .map((spec) => ({
-        label: spec.label.trim(),
-        value: spec.value.trim(),
-        icon: spec.icon.trim() || undefined,
-      }))
-      .filter((spec) => spec.label && spec.value);
-
-    if (!formData.name || !formData.category || !cleanImage) {
-      toast.error("Please fill in required fields");
-      return;
-    }
-
-    const payload = {
-      ...formData,
-      images: [cleanImage],
-      colors: cleanColors.length > 0 ? cleanColors : ["Default"],
-      specifications: cleanSpecifications,
-      subcategory: formData.subcategory || undefined,
-      reviews: formData.reviews.trim() ? Number(formData.reviews) : undefined,
-    };
-
-    if (editingProduct) {
-      updateProduct(editingProduct.id, payload);
-      toast.success("Product updated");
-    } else {
-      addProduct(payload);
-      toast.success("Product added");
-    }
-    setShowModal(false);
-  };
-
-  const handleProductImageUpload = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    try {
-      const imageData = await readImageAsDataUrl(file);
-      setFormData((prev) => ({ ...prev, images: [imageData] }));
-    } catch {
-      toast.error("Image upload failed");
-    }
-  };
-
-  const addColor = () => setFormData({...formData, colors: [...formData.colors, ""]});
-  const removeColor = (index: number) => setFormData({...formData, colors: formData.colors.filter((_, i) => i !== index)});
-  const selectedCategory = categories.find((category) => category.id === formData.category);
-  const availableSubcategories = selectedCategory?.subcategories || [];
-
-  const handleCategoryChange = (value: string) => {
-    const nextCategory = categories.find((category) => category.id === value);
-    const defaultSubcategory = nextCategory?.subcategories?.[0] || "";
-    setFormData({
-      ...formData,
-      category: value,
-      subcategory: defaultSubcategory,
-    });
-  };
-
-  const updateColor = (index: number, value: string) => {
-    const newColors = [...formData.colors];
-    newColors[index] = value;
-    setFormData({...formData, colors: newColors});
-  };
-  const addSpecification = () =>
-    setFormData({
-      ...formData,
-      specifications: [...formData.specifications, { label: "", value: "", icon: "display" }],
-    });
-  const removeSpecification = (index: number) =>
-    setFormData({
-      ...formData,
-      specifications: formData.specifications.filter((_, i) => i !== index),
-    });
-  const updateSpecification = (index: number, key: keyof ProductSpecForm, value: string) => {
-    const nextSpecifications = [...formData.specifications];
-    nextSpecifications[index] = { ...nextSpecifications[index], [key]: value };
-    setFormData({ ...formData, specifications: nextSpecifications });
-  };
-
-  const filteredProducts = products.filter((product) => {
-    const categoryMatched = categoryFilter === "all" || product.category === categoryFilter;
-    if (!categoryMatched) return false;
-
-    if (!searchText.trim()) return true;
-    const keyword = searchText.toLowerCase();
-    return (
-      product.name.toLowerCase().includes(keyword) ||
-      (product.brand || "").toLowerCase().includes(keyword) ||
-      (product.subcategory || "").toLowerCase().includes(keyword)
-    );
-  });
-
-  return (
-    <div>
-      <SectionHeading
-        title="Products"
-        action={(
-          <button onClick={() => handleOpenModal()} className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground transition-colors hover:bg-primary/90">
-            <Plus className="h-4 w-4" />Add Product
-          </button>
-        )}
-      />
-
-      <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-        <div className="mb-4 flex flex-wrap items-center gap-2">
-          <select
-            value={categoryFilter}
-            onChange={(event) => setCategoryFilter(event.target.value)}
-            className="h-10 rounded-lg border border-gray-200 bg-gray-50 px-3 text-sm text-gray-700 outline-none"
-          >
-            <option value="all">All Categories</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>{category.name}</option>
-            ))}
-          </select>
-
-          <div className="relative w-full max-w-sm">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-            <input
-              value={searchText}
-              onChange={(event) => setSearchText(event.target.value)}
-              placeholder="Search product"
-              className="h-10 w-full rounded-lg border border-gray-200 bg-gray-50 pl-9 pr-3 text-sm text-gray-700 outline-none transition focus:border-primary"
-            />
-          </div>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-215 text-left text-sm">
-            <thead>
-              <tr className="border-b border-gray-200 text-xs uppercase tracking-wide text-gray-500">
-                <th className="pb-3 font-medium">Product</th>
-                <th className="pb-3 font-medium">Category</th>
-                <th className="pb-3 font-medium">Price</th>
-                <th className="pb-3 font-medium">Stock</th>
-                <th className="pb-3 font-medium">Status</th>
-                <th className="pb-3 text-right font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredProducts.map((product) => {
-                const category = categories.find((item) => item.id === product.category);
-
-                return (
-                  <tr key={product.id} className="border-b border-gray-100 last:border-b-0">
-                    <td className="py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="relative h-11 w-11 overflow-hidden rounded-md bg-gray-100">
-                          <Image src={product.images[0]} alt={product.name} fill className="object-cover" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-gray-900">{product.name}</p>
-                          <p className="text-xs text-gray-500">{product.subcategory || product.brand || "-"}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-3 text-gray-600">{category?.name || "Unknown"}</td>
-                    <td className="py-3 font-medium text-gray-900">{formatCurrency(product.price)}</td>
-                    <td className="py-3">
-                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${product.inStock ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"}`}>
-                        {product.inStock ? "In stock" : "Out of stock"}
-                      </span>
-                    </td>
-                    <td className="py-3">
-                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${product.isFlashDeal ? "bg-amber-100 text-amber-700" : "bg-gray-100 text-gray-600"}`}>
-                        {product.isFlashDeal ? "Flash deal" : "Regular"}
-                      </span>
-                    </td>
-                    <td className="py-3">
-                      <div className="flex items-center justify-end gap-2">
-                        <button onClick={() => handleOpenModal(product)} className="rounded-md border border-gray-200 p-2 text-gray-600 transition-colors hover:bg-gray-50"><Edit2 className="h-4 w-4" /></button>
-                        <button onClick={() => {
-                          if (!window.confirm("Are you sure you want to delete this product?")) return;
-                          deleteProduct(product.id);
-                          toast.success("Deleted successfully");
-                        }} className="rounded-md border border-rose-200 p-2 text-rose-500 transition-colors hover:bg-rose-50"><Trash2 className="h-4 w-4" /></button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-
-        {filteredProducts.length === 0 && (
-          <p className="py-8 text-center text-sm text-gray-500">No product matched your filters.</p>
-        )}
-      </div>
-      {showModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-card rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold">{editingProduct ? "Edit" : "Add"} Product</h3>
-              <button onClick={() => setShowModal(false)}><X className="w-5 h-5" /></button>
-            </div>
-            <form onSubmit={handleSubmit} className="space-y-3">
-              <input type="text" placeholder="Name" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full px-3 py-2 bg-secondary rounded-lg" required />
-              <div>
-                <label className="mb-1 block text-sm font-medium">Primary Product Image</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleProductImageUpload}
-                  className="w-full rounded-lg bg-secondary px-3 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-primary-foreground"
-                />
-                {formData.images[0] && (
-                  <div className="relative mt-2 h-36 w-full overflow-hidden rounded-lg bg-secondary">
-                    <Image
-                      src={formData.images[0]}
-                      alt="Product preview"
-                      fill
-                      unoptimized
-                      className="object-cover"
-                    />
-                  </div>
-                )}
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <input type="number" step="0.01" placeholder="Price" value={formData.price} onChange={(e) => setFormData({...formData, price: Number(e.target.value)})} className="w-full px-3 py-2 bg-secondary rounded-lg" required />
-                <input type="number" step="0.01" placeholder="Original Price" value={formData.originalPrice} onChange={(e) => setFormData({...formData, originalPrice: Number(e.target.value)})} className="w-full px-3 py-2 bg-secondary rounded-lg" />
-              </div>
-              <select value={formData.category} onChange={(e) => handleCategoryChange(e.target.value)} className="w-full px-3 py-2 bg-secondary rounded-lg" required>
-                <option value="">Select Category</option>
-                {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </select>
-              {availableSubcategories.length > 0 && (
-                <select
-                  value={formData.subcategory}
-                  onChange={(e) => setFormData({ ...formData, subcategory: e.target.value })}
-                  className="w-full px-3 py-2 bg-secondary rounded-lg"
-                >
-                  <option value="">Select Subcategory (optional)</option>
-                  {availableSubcategories.map((subcategory) => (
-                    <option key={subcategory} value={subcategory}>{subcategory}</option>
-                  ))}
-                </select>
-              )}
-              <input type="text" placeholder="Brand (optional)" value={formData.brand} onChange={(e) => setFormData({...formData, brand: e.target.value})} className="w-full px-3 py-2 bg-secondary rounded-lg" />
-              <input type="number" min="0" step="1" placeholder="Reviews count (optional)" value={formData.reviews} onChange={(e) => setFormData({...formData, reviews: e.target.value})} className="w-full px-3 py-2 bg-secondary rounded-lg" />
-              <input type="text" placeholder="Barcode (optional)" value={formData.barcode} onChange={(e) => setFormData({...formData, barcode: e.target.value})} className="w-full px-3 py-2 bg-secondary rounded-lg" />
-              <textarea placeholder="Description" value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} className="w-full px-3 py-2 bg-secondary rounded-lg resize-none" rows={3} />
-              
-              <div>
-                <label className="block text-sm font-medium mb-2">Colors</label>
-                {formData.colors.map((color, index) => (
-                  <div key={index} className="flex gap-2 mb-2">
-                    <input type="text" placeholder="Color name" value={color} onChange={(e) => updateColor(index, e.target.value)} className="flex-1 px-3 py-2 bg-secondary rounded-lg" />
-                    {formData.colors.length > 1 && <button type="button" onClick={() => removeColor(index)} className="p-2 text-destructive"><X className="w-4 h-4" /></button>}
-                  </div>
-                ))}
-                <button type="button" onClick={addColor} className="text-sm text-primary">+ Add Color</button>
-              </div>
-              <div>
-                <label className="mb-2 block text-sm font-medium">Specifications / Features</label>
-                <div className="space-y-2">
-                  {formData.specifications.map((spec, index) => (
-                    <div key={`spec-${index}`} className="grid grid-cols-12 gap-2">
-                      <select
-                        value={spec.icon}
-                        onChange={(e) => updateSpecification(index, "icon", e.target.value)}
-                        className="col-span-4 rounded-lg bg-secondary px-2 py-2 text-sm"
-                      >
-                        {productSpecIconOptions.map((iconName) => (
-                          <option key={iconName} value={iconName}>
-                            {iconName}
-                          </option>
-                        ))}
-                      </select>
-                      <input
-                        type="text"
-                        placeholder="Label"
-                        value={spec.label}
-                        onChange={(e) => updateSpecification(index, "label", e.target.value)}
-                        className="col-span-3 rounded-lg bg-secondary px-3 py-2"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Value"
-                        value={spec.value}
-                        onChange={(e) => updateSpecification(index, "value", e.target.value)}
-                        className="col-span-4 rounded-lg bg-secondary px-3 py-2"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeSpecification(index)}
-                        className="col-span-1 p-2 text-destructive"
-                        disabled={formData.specifications.length === 1}
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                <button type="button" onClick={addSpecification} className="mt-2 text-sm text-primary">
-                  + Add Specification
-                </button>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <label className="flex items-center gap-2"><input type="checkbox" checked={formData.inStock} onChange={(e) => setFormData({...formData, inStock: e.target.checked})} className="w-4 h-4" /> In Stock</label>
-                <label className="flex items-center gap-2"><input type="checkbox" checked={formData.isFlashDeal} onChange={(e) => setFormData({...formData, isFlashDeal: e.target.checked})} className="w-4 h-4" /> Flash Deal</label>
-              </div>
-              <input type="number" placeholder="Discount %" value={formData.discountPercent} onChange={(e) => setFormData({...formData, discountPercent: Number(e.target.value)})} className="w-full px-3 py-2 bg-secondary rounded-lg" />
-
-              <div className="flex gap-3">
-                <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-2 bg-secondary rounded-lg">Cancel</button>
-                <button type="submit" className="flex-1 py-2 bg-primary text-white rounded-lg">{editingProduct ? "Update" : "Add"}</button>
               </div>
             </form>
           </div>
@@ -1863,6 +1499,8 @@ export function AdminDashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchParams] = useSearchParams();
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useAdminAuth();
   const { products, orders, categories, promoCodes } = useStore();
   const pathSegment = location.pathname.split("/")[2] || "";
   const pathTabMap: Record<string, string> = {
@@ -1940,15 +1578,19 @@ export function AdminDashboardPage() {
   };
 
   const activeSectionLabel = sectionLabelMap[activeTab] || "Overview";
+  const handleLogout = () => {
+    logout();
+    navigate("/admin", { replace: true });
+  };
 
   const renderContent = () => {
     switch (activeTab) {
-      case "sliders": return <SliderManagement />;
-      case "banner-list": return <BannerListManagement />;
-      case "categories": return <CategoryManagement />;
-      case "tag-category": return <TagCategoryManagement />;
-      case "products": return <ProductManagement />;
-      case "entry-products": return <EntryProductsManagement />;
+      case "sliders": return <AdminBannerPage />;
+      case "banner-list": return <AdminBannerPage />;
+      case "categories": return <AdminCategoryPage />;
+      case "tag-category": return <AdminSubCategoryPage />;
+      case "products": return <AdminProductsPage />;
+      case "entry-products": return <AdminProductsPage />;
       case "entry-promotion": return <EntryPromotionManagement />;
       case "flash-deals": return <FlashDealManagement />;
       case "flash-sale": return <FlashSaleManagement />;
@@ -1966,7 +1608,7 @@ export function AdminDashboardPage() {
       default:
         return (
           <div className="space-y-6">
-            <section className="relative overflow-hidden rounded-[32px] border border-slate-200/70 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-6 text-white shadow-[0_28px_80px_rgba(15,23,42,0.22)]">
+            <section className="relative overflow-hidden rounded-4xl border border-slate-200/70 bg-linear-to-br from-slate-950 via-slate-900 to-slate-800 p-6 text-white shadow-[0_28px_80px_rgba(15,23,42,0.22)]">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.22),transparent_26%),radial-gradient(circle_at_bottom_left,rgba(99,102,241,0.28),transparent_30%)]" />
               <div className="relative flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
                 <div className="max-w-2xl">
@@ -1977,7 +1619,7 @@ export function AdminDashboardPage() {
                     wrapped in a cleaner and more premium dashboard experience.
                   </p>
                 </div>
-                <div className="grid gap-3 sm:grid-cols-3 xl:min-w-[420px]">
+                <div className="grid gap-3 sm:grid-cols-3 xl:min-w-105">
                   <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
                     <p className="text-xs uppercase tracking-[0.22em] text-slate-300">Revenue</p>
                     <p className="mt-2 text-2xl font-bold text-white">{formatCurrency(totalRevenue)}</p>
@@ -2133,8 +1775,12 @@ export function AdminDashboardPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(99,102,241,0.08),_transparent_22%),radial-gradient(circle_at_top_right,_rgba(56,189,248,0.08),_transparent_22%),linear-gradient(180deg,_#f8fafc_0%,_#eef2ff_100%)]">
-      <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+    <div className="flex min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(99,102,241,0.08),transparent_22%),radial-gradient(circle_at_top_right,rgba(56,189,248,0.08),transparent_22%),linear-gradient(180deg,#f8fafc_0%,#eef2ff_100%)]">
+      <AdminSidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        onLogout={handleLogout}
+      />
       
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="sticky top-0 z-30 border-b border-white/50 bg-white/70 backdrop-blur-xl">
@@ -2149,17 +1795,18 @@ export function AdminDashboardPage() {
               </div>
             </div>
 
-            <Link
-              to="/admin"
+            <button
+              type="button"
+              onClick={handleLogout}
               className="rounded-full border border-rose-200 bg-white/80 px-4 py-2 text-sm font-semibold text-rose-500 shadow-sm transition-colors hover:bg-rose-50"
             >
               Logout
-            </Link>
+            </button>
           </div>
         </div>
 
         <div className="flex-1 overflow-auto p-3 md:p-4 lg:p-5">
-          <div className="w-full rounded-[32px] border border-white/70 bg-white/55 p-3 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur transition-all duration-300 md:p-4">
+          <div className="w-full rounded-4xl border border-white/70 bg-white/55 p-3 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur transition-all duration-300 md:p-4">
             {renderContent()}
           </div>
         </div>

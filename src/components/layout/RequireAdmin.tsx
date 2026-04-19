@@ -12,7 +12,13 @@ export function RequireAdmin({ children }: RequireAdminProps) {
   const location = useLocation();
 
   if (!isAdminAuthenticated) {
-    return <Navigate to="/admin" replace state={{ from: location.pathname }} />;
+    return (
+      <Navigate
+        to="/admin"
+        replace
+        state={{ from: `${location.pathname}${location.search}` }}
+      />
+    );
   }
 
   return <>{children}</>;

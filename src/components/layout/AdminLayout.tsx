@@ -33,8 +33,8 @@ export function AdminLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-secondary/35 transition-colors duration-300">
-      <header className="border-b border-border bg-background/95 backdrop-blur transition-all duration-300">
+    <div className="min-h-screen bg-linear-to-b from-primary/[0.06] via-background to-background transition-colors duration-300">
+      <header className="sticky top-0 z-50 border-b border-border/70 bg-background/90 backdrop-blur-md transition-all duration-300">
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link to="/" className="flex items-center gap-2 font-semibold text-foreground">
             <Store className="h-5 w-5 text-primary" />
@@ -58,8 +58,8 @@ export function AdminLayout() {
         </div>
       </header>
 
-      <div className="mx-auto grid w-full max-w-[1700px] gap-4 px-3 py-5 sm:px-4 lg:grid-cols-[228px_1fr] lg:px-5">
-        <aside className="h-fit rounded-xl border border-border/80 bg-background/90 p-2.5 shadow-sm">
+      <div className="mx-auto grid w-full max-w-[1700px] gap-4 px-3 py-5 sm:px-4 lg:grid-cols-[248px_1fr] lg:gap-5 lg:px-5">
+        <aside className="h-fit rounded-2xl border border-border/70 bg-card/90 p-2.5 shadow-sm backdrop-blur-sm lg:sticky lg:top-20 lg:max-h-[calc(100vh-5.5rem)] lg:overflow-y-auto">
           <nav className="space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -69,10 +69,10 @@ export function AdminLayout() {
                   to={item.to}
                   end={item.end}
                   className={({ isActive }) =>
-                    `flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                    `flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-200 ${
                       isActive
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:bg-secondary/70 hover:text-foreground"
+                        ? "bg-primary text-primary-foreground shadow-[0_10px_24px_-14px_hsl(var(--primary))]"
+                        : "text-muted-foreground hover:bg-primary/10 hover:text-foreground"
                     }`
                   }
                 >
@@ -84,7 +84,7 @@ export function AdminLayout() {
           </nav>
         </aside>
 
-        <main className="transition-all duration-300 ease-out">
+        <main className="min-w-0 rounded-2xl border border-border/60 bg-background/70 p-2 shadow-[0_18px_35px_-28px_rgba(15,23,42,0.35)] transition-all duration-300 ease-out sm:p-3 lg:p-4">
           <Outlet />
         </main>
       </div>

@@ -6,3 +6,7 @@ export { AdminOrdersPage } from "./orders/AdminOrdersPage";
 export { AdminProductsPage } from "./products/AdminProductsPage";
 export { AdminReportsPage } from "./reports/AdminReportsPage";
 export { AdminSettingsPage } from "./settings/AdminSettingsPage";
+export { AdminManageAdminsPage } from "./manage-admins/AdminManageAdminsPage";
+export { AdminCategoryPage } from "./category/AdminCategoryPage";
+export { AdminSubCategoryPage } from "./subcategory/AdminSubCategoryPage";
+export { AdminBannerPage } from "./banner/AdminBannerPage";
