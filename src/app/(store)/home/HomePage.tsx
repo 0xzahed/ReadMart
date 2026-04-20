@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MobileHeader } from "@/components/layout/MobileHeader";
 import { HeroSlider } from "@/components/sections/HeroSlider";
@@ -12,7 +13,11 @@ import { Link } from "react-router-dom";
 
 export function HomePage() {
   const navigate = useNavigate();
-  const { categories, products } = useStore();
+  const { categories, products, refreshStorefrontData } = useStore();
+
+  useEffect(() => {
+    void refreshStorefrontData();
+  }, [refreshStorefrontData]);
 
   const handleSearch = (query: string) => {
     navigate(`/search?q=${encodeURIComponent(query)}`);

@@ -72,6 +72,7 @@ export function FlashDeals() {
                   imageUrl={imageUrl}
                   price={flashPrice}
                   previousPrice={previousPrice}
+                  to={`/product/${product.id}`}
                   compact
                 />
               </div>

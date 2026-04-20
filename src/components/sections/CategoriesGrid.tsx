@@ -28,7 +28,7 @@ export function CategoriesGrid({ maxVisible = 6 }: CategoriesGridProps) {
           ) : null}
         </div>
 
-        <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:gap-4 lg:grid-cols-6 xl:grid-cols-7">
+        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 md:grid-cols-4 md:gap-4 lg:grid-cols-6 xl:grid-cols-7">
           {visibleCategories.map((category) => (
             <Link
               key={category.id}
@@ -40,6 +40,7 @@ export function CategoriesGrid({ maxVisible = 6 }: CategoriesGridProps) {
                   src={category.image}
                   alt={category.name}
                   fill
+                  unoptimized
                   className="object-cover p-3"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;

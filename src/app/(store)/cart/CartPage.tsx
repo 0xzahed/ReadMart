@@ -158,7 +158,7 @@ export function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-32">
+    <div className="min-h-screen bg-background pb-[calc(8.5rem+env(safe-area-inset-bottom))] lg:pb-10">
       <StorePageHeader
         title={`Cart (${cartItems.length})`}
         onBack={() => navigate(-1)}
@@ -173,9 +173,9 @@ export function CartPage() {
       <div className="mx-auto w-full max-w-[1400px] px-4 py-5 space-y-4 sm:px-6 lg:px-8 lg:py-8">
         {cartItems.map((item) => (
           <StoreCard key={item.productId}>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               {/* Product Image */}
-              <div className="relative w-24 h-24 shrink-0 overflow-hidden rounded-lg bg-secondary">
+              <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-secondary sm:h-24 sm:w-24">
                 <Image
                   src={item.product.images[0]}
                   alt={item.product.name}
@@ -185,7 +185,7 @@ export function CartPage() {
               </div>
 
               {/* Product Info */}
-              <div className="flex-1 min-w-0">
+              <div className="min-w-0 flex-1">
                 <h3 className="font-medium text-foreground truncate">
                   {item.product.name}
                 </h3>
@@ -213,7 +213,7 @@ export function CartPage() {
               </div>
 
               {/* Quantity Controls */}
-              <div className="flex flex-col items-end justify-between">
+              <div className="flex w-full items-center justify-between sm:w-auto sm:flex-col sm:items-end sm:justify-between">
                 <button
                   onClick={() => handleRemoveItem(item.productId)}
                   className="p-1 hover:bg-secondary rounded transition-colors text-muted-foreground"
@@ -249,7 +249,7 @@ export function CartPage() {
       <div className="mx-auto w-full max-w-[1400px] px-4 py-4 sm:px-6 lg:px-8">
         <StoreCard>
           <h3 className="font-semibold text-foreground mb-3">Promo Code</h3>
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row">
             <div className="flex-1 relative">
               <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <input
@@ -263,6 +263,7 @@ export function CartPage() {
             <StoreButton
               onClick={handleApplyPromoCode}
               size="md"
+              className="shrink-0 sm:min-w-[7rem]"
             >
               Apply
             </StoreButton>
@@ -304,8 +305,18 @@ export function CartPage() {
         </StoreCard>
       </div>
 
+      <div className="mx-auto hidden w-full max-w-[1400px] px-4 pb-10 sm:px-6 lg:block lg:px-8">
+        <StoreButton
+          onClick={() => setShowCheckout(true)}
+          fullWidth
+          size="lg"
+        >
+          Checkout
+        </StoreButton>
+      </div>
+
       {/* Checkout Button */}
-      <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border p-4 z-40 md:pb-20">
+      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-card p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] lg:hidden">
         <div className="mx-auto w-full max-w-[1400px]">
           <StoreButton
             onClick={() => setShowCheckout(true)}

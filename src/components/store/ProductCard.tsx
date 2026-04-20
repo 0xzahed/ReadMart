@@ -19,6 +19,7 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
             src={product.images[0]}
             alt={product.name}
             fill
+            unoptimized
             className={`object-contain transition-transform duration-300 group-hover:scale-105 ${compact ? "p-2" : "p-3 lg:p-4"}`}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
@@ -44,7 +45,7 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
           </h3>
 
           {/* Price Section */}
-          <div className="mt-auto flex items-center gap-2 whitespace-nowrap">
+          <div className="mt-auto flex flex-wrap items-center gap-x-2 gap-y-1">
             {/* Current Price - Left, Black, Bold */}
             <span className={`font-bold text-price-original ${
               compact ? "text-sm" : "text-base lg:text-lg"

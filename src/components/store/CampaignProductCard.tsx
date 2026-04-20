@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { Link } from "react-router-dom";
 
 type CampaignProductCardProps = {
   title: string;
@@ -9,6 +10,7 @@ type CampaignProductCardProps = {
   previousPrice?: number | null;
   badge?: string;
   compact?: boolean;
+  to?: string;
 };
 
 export function CampaignProductCard({
@@ -18,8 +20,9 @@ export function CampaignProductCard({
   previousPrice,
   badge,
   compact = false,
+  to,
 }: CampaignProductCardProps) {
-  return (
+  const cardContent = (
     <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
       <div className={`relative overflow-hidden bg-secondary ${compact ? "aspect-4/5" : "aspect-4/5"}`}>
         {imageUrl ? (
@@ -27,6 +30,7 @@ export function CampaignProductCard({
             src={imageUrl}
             alt={title}
             fill
+            unoptimized
             className={`object-contain transition-transform duration-300 hover:scale-105 ${compact ? "p-2" : "p-3 lg:p-4"}`}
           />
         ) : (
@@ -47,7 +51,7 @@ export function CampaignProductCard({
           {title}
         </h3>
 
-        <div className="mt-auto flex items-center gap-2 whitespace-nowrap">
+        <div className="mt-auto flex flex-wrap items-center gap-x-2 gap-y-1">
           <span className={`font-bold text-price-original ${compact ? "text-sm" : "text-base lg:text-lg"}`}>
             ${price.toFixed(2)}
           </span>
@@ -58,5 +62,15 @@ export function CampaignProductCard({
         </div>
       </div>
     </article>
+  );
+
+  if (!to) {
+    return cardContent;
+  }
+
+  return (
+    <Link to={to} className="block h-full">
+      {cardContent}
+    </Link>
   );
 }

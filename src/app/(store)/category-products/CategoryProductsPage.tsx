@@ -45,7 +45,11 @@ export function CategoryProductsPage() {
       const subcategoryProducts = categoryProducts.filter(
         (product) => (product.subcategory || "").trim() === subcategory,
       );
-      const representativeImage = subcategoryProducts[0]?.images?.[0] || category?.image || "";
+      const representativeImage =
+        category?.subCategoryImageMap?.[subcategory] ||
+        subcategoryProducts[0]?.images?.[0] ||
+        category?.image ||
+        "";
 
       return {
         key: subcategory,
@@ -69,7 +73,7 @@ export function CategoryProductsPage() {
     }));
 
     return [allCard, ...cards, ...fallbackCards];
-  }, [availableSubcategories, categoryProducts, category?.image]);
+  }, [availableSubcategories, categoryProducts, category?.image, category?.subCategoryImageMap]);
 
   const selectedCard = subcategoryCards.find((card) => card.key === selectedSubcategory);
   const activeSubcategoryFilter = selectedCard?.filterValue || "all";
@@ -160,6 +164,7 @@ export function CategoryProductsPage() {
                             src={subcategory.image}
                             alt={subcategory.name}
                             fill
+                            unoptimized
                             className="object-cover p-2"
                           />
                         ) : null}

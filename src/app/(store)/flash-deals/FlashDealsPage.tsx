@@ -113,6 +113,7 @@ export function FlashDealsPage() {
                     price={flashPrice}
                     previousPrice={discountedPrice}
                     badge={firstVariant ? undefined : "No Variant"}
+                    to={`/product/${product.id}`}
                   />
                 );
               })}

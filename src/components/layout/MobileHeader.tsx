@@ -64,72 +64,83 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/90">
       {/* Mobile Header */}
       <div className="p-3 lg:hidden">
-        {/* Top Bar */}
-        <div className="flex items-center justify-between gap-3">
-          {/* Logo - always visible */}
-          <Link to="/" className="text-lg font-bold text-primary shrink-0">ReadMart</Link>
-
-          <div className="flex flex-1 items-center justify-end gap-2 min-w-0">
-            {/* Search icon + inline expanding field */}
-            <div className="flex items-center justify-end min-w-0">
-              {searchExpanded ? (
-                <form onSubmit={handleSearch} className="w-[150px]">
-                  <input
-                    ref={searchInputRef}
-                    type="text"
-                    placeholder="Search..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onBlur={() => {
-                      if (!searchQuery.trim()) {
-                        setSearchExpanded(false);
-                      }
-                    }}
-                    className="w-full rounded-md border border-border bg-transparent px-2 py-1 text-sm text-foreground shadow-none placeholder:text-muted-foreground focus:outline-none focus:ring-0"
-                  />
-                </form>
-              ) : (
-                <button
-                  onClick={() => setSearchExpanded(true)}
-                  className="relative p-2.5 rounded-full bg-secondary hover:bg-secondary/80 transition-colors"
-                >
-                  <Search className="w-5 h-5 text-foreground" />
-                </button>
-              )}
+        {searchExpanded ? (
+          <form onSubmit={handleSearch} className="flex items-center gap-2">
+            <div className="relative min-w-0 flex-1">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                placeholder="Search products"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onBlur={() => {
+                  if (!searchQuery.trim()) {
+                    setSearchExpanded(false);
+                  }
+                }}
+                className="h-10 w-full rounded-full border border-border bg-secondary pl-9 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+              />
             </div>
-
-            {/* Notification Icon */}
-          <div className="relative">
             <button
-              onClick={() => navigate("/notifications")}
-              className="relative p-2.5 rounded-full bg-secondary hover:bg-secondary/80 transition-colors"
+              type="button"
+              onClick={() => {
+                setSearchExpanded(false);
+                if (!searchQuery.trim()) {
+                  setSearchQuery("");
+                }
+              }}
+              className="shrink-0 rounded-full border border-border px-3 py-2 text-xs font-medium text-foreground transition-colors hover:bg-secondary"
             >
-              <Bell className="w-5 h-5 text-foreground" />
-              {unreadNotificationCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-primary text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-semibold">
-                  {unreadNotificationCount > 9 ? "9+" : unreadNotificationCount}
-                </span>
-              )}
+              Cancel
             </button>
+          </form>
+        ) : (
+          <div className="flex items-center justify-between gap-2">
+            <Link to="/" className="shrink-0 text-lg font-bold text-primary">
+              ReadMart
+            </Link>
 
+            <div className="flex min-w-0 items-center justify-end gap-2">
+              <button
+                onClick={() => setSearchExpanded(true)}
+                className="relative rounded-full bg-secondary p-2.5 transition-colors hover:bg-secondary/80"
+                aria-label="Search"
+              >
+                <Search className="h-5 w-5 text-foreground" />
+              </button>
+
+              <div className="relative">
+                <button
+                  onClick={() => navigate("/notifications")}
+                  className="relative rounded-full bg-secondary p-2.5 transition-colors hover:bg-secondary/80"
+                  aria-label="Notifications"
+                >
+                  <Bell className="h-5 w-5 text-foreground" />
+                  {unreadNotificationCount > 0 && (
+                    <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">
+                      {unreadNotificationCount > 9 ? "9+" : unreadNotificationCount}
+                    </span>
+                  )}
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowCartDrawer(true)}
+                className="relative rounded-full bg-secondary p-2.5 transition-colors hover:bg-secondary/80"
+                aria-label="Open cart"
+              >
+                <ShoppingCart className="h-5 w-5 text-foreground" />
+                {cart.length > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">
+                    {cart.length > 9 ? "9+" : cart.length}
+                  </span>
+                )}
+              </button>
+            </div>
           </div>
-
-          {/* Cart Icon */}
-          <button
-            type="button"
-            onClick={() => setShowCartDrawer(true)}
-            className="relative p-2.5 rounded-full bg-secondary hover:bg-secondary/80 transition-colors"
-          >
-            <ShoppingCart className="w-5 h-5 text-foreground" />
-            {cart.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-primary text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-semibold">
-                {cart.length > 9 ? "9+" : cart.length}
-              </span>
-            )}
-          </button>
-          </div>
-        </div>
-
+        )}
       </div>
 
       <div className="mx-auto hidden w-full max-w-[1400px] items-center gap-6 px-6 py-4 lg:flex">

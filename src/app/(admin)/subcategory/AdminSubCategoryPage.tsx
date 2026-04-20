@@ -54,6 +54,11 @@ type SubCategoriesListData = {
 };
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "";
+const MAX_LIST_LIMIT = 100;
+const SUBCATEGORY_IMAGE_PLACEHOLDER =
+  `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
+    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'><rect width='120' height='120' rx='16' fill='#f3f4f6'/><path d='M20 84l24-24 14 14 18-22 24 32H20z' fill='#d1d5db'/><circle cx='44' cy='40' r='10' fill='#d1d5db'/></svg>",
+  )}`;
 
 const formatDateTime = (value: string) => {
   const date = new Date(value);
@@ -70,16 +75,101 @@ const getErrorMessage = async (response: Response, fallback: string) => {
   }
 };
 
-const buildAssetUrl = (apiBaseUrl: string, imageUrl: string) => {
-  if (!imageUrl) return "";
-  if (/^https?:\/\//i.test(imageUrl)) return imageUrl;
+const toAbsoluteAssetUrl = (apiBaseUrl: string, candidatePath: string) => {
+  if (!candidatePath) return "";
+  if (/^https?:\/\//i.test(candidatePath)) return candidatePath;
 
+  const normalizedPath = candidatePath.startsWith("/") ? candidatePath : `/${candidatePath}`;
   try {
     const base = new URL(apiBaseUrl);
-    return `${base.protocol}//${base.host}${imageUrl.startsWith("/") ? imageUrl : `/${imageUrl}`}`;
+    return `${base.protocol}//${base.host}${normalizedPath}`;
   } catch {
-    return imageUrl;
+    return normalizedPath;
   }
+};
+
+const buildAssetUrlCandidates = (apiBaseUrl: string, imageUrl: string): string[] => {
+  if (!imageUrl) return [];
+
+  const normalizedPath = imageUrl.startsWith("/") ? imageUrl : `/${imageUrl}`;
+  const uploadPrefix = "/upload/";
+  const candidates = new Set<string>();
+
+  const appendCandidate = (candidatePath: string) => {
+    const absoluteUrl = toAbsoluteAssetUrl(apiBaseUrl, candidatePath);
+    if (absoluteUrl) {
+      candidates.add(absoluteUrl);
+    }
+  };
+
+  appendCandidate(normalizedPath);
+
+  if (!normalizedPath.startsWith(uploadPrefix)) {
+    return Array.from(candidates);
+  }
+
+  const remainder = normalizedPath.slice(uploadPrefix.length);
+  const firstSlashIndex = remainder.indexOf("/");
+  const folderName = firstSlashIndex === -1 ? "" : remainder.slice(0, firstSlashIndex);
+  const fileName = firstSlashIndex === -1 ? remainder : remainder.slice(firstSlashIndex + 1);
+
+  if (!folderName && fileName) {
+    appendCandidate(`${uploadPrefix}subCategories/${fileName}`);
+    appendCandidate(`${uploadPrefix}subcategories/${fileName}`);
+    appendCandidate(`${uploadPrefix}subCategory/${fileName}`);
+  }
+
+  if (folderName === "subCategories" && fileName) {
+    appendCandidate(`${uploadPrefix}${fileName}`);
+    appendCandidate(`${uploadPrefix}subcategories/${fileName}`);
+    appendCandidate(`${uploadPrefix}subCategory/${fileName}`);
+  }
+
+  if ((folderName === "subcategories" || folderName === "subCategory") && fileName) {
+    appendCandidate(`${uploadPrefix}${fileName}`);
+    appendCandidate(`${uploadPrefix}subCategories/${fileName}`);
+  }
+
+  return Array.from(candidates);
+};
+
+const buildAssetUrl = (apiBaseUrl: string, imageUrl: string) => {
+  return buildAssetUrlCandidates(apiBaseUrl, imageUrl)[0] ?? "";
+};
+
+type ResilientSubCategoryImageProps = {
+  apiBaseUrl: string;
+  imageUrl: string;
+  title: string;
+};
+
+const ResilientSubCategoryImage = ({
+  apiBaseUrl,
+  imageUrl,
+  title,
+}: ResilientSubCategoryImageProps) => {
+  const imageCandidates = useMemo(
+    () => buildAssetUrlCandidates(apiBaseUrl, imageUrl),
+    [apiBaseUrl, imageUrl],
+  );
+  const [imageIndex, setImageIndex] = useState(0);
+
+  const imageSrc = imageCandidates[imageIndex] ?? SUBCATEGORY_IMAGE_PLACEHOLDER;
+
+  return (
+    <Image
+      src={imageSrc}
+      alt={title}
+      fill
+      unoptimized
+      className="object-cover"
+      onError={() => {
+        setImageIndex((previousIndex) =>
+          previousIndex < imageCandidates.length ? previousIndex + 1 : previousIndex,
+        );
+      }}
+    />
+  );
 };
 
 export function AdminSubCategoryPage() {
@@ -123,17 +213,30 @@ export function AdminSubCategoryPage() {
     if (!isApiReady) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/categories?page=1&limit=100`, {
-        method: "GET",
-      });
+      let page = 1;
+      let totalPage = 1;
+      const nextCategories: CategoryItem[] = [];
 
-      const payload = (await response.json()) as ApiResponse<CategoriesListData>;
+      while (page <= totalPage) {
+        const response = await fetch(`${API_BASE_URL}/categories?page=${page}&limit=${MAX_LIST_LIMIT}`, {
+          method: "GET",
+          cache: "no-store",
+        });
 
-      if (!response.ok || !payload?.status) {
-        throw new Error(payload?.message || "Failed to fetch categories.");
+        const payload = (await response.json()) as ApiResponse<CategoriesListData>;
+
+        if (!response.ok || !payload?.status) {
+          throw new Error(payload?.message || "Failed to fetch categories.");
+        }
+
+        if (Array.isArray(payload?.data?.categories)) {
+          nextCategories.push(...payload.data.categories);
+        }
+
+        totalPage = payload?.data?.meta?.totalPage ?? page;
+        page += 1;
       }
 
-      const nextCategories = Array.isArray(payload?.data?.categories) ? payload.data.categories : [];
       setCategories(nextCategories);
 
       if (!categoryId && nextCategories.length > 0) {
@@ -151,17 +254,31 @@ export function AdminSubCategoryPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/subcategories?page=1&limit=200`, {
-        method: "GET",
-      });
+      let page = 1;
+      let totalPage = 1;
+      const nextSubCategories: SubCategoryItem[] = [];
 
-      const payload = (await response.json()) as ApiResponse<SubCategoriesListData>;
+      while (page <= totalPage) {
+        const response = await fetch(`${API_BASE_URL}/subcategories?page=${page}&limit=${MAX_LIST_LIMIT}`, {
+          method: "GET",
+          cache: "no-store",
+        });
 
-      if (!response.ok || !payload?.status) {
-        throw new Error(payload?.message || "Failed to fetch subcategories.");
+        const payload = (await response.json()) as ApiResponse<SubCategoriesListData>;
+
+        if (!response.ok || !payload?.status) {
+          throw new Error(payload?.message || "Failed to fetch subcategories.");
+        }
+
+        if (Array.isArray(payload?.data?.subCategories)) {
+          nextSubCategories.push(...payload.data.subCategories);
+        }
+
+        totalPage = payload?.data?.meta?.totalPage ?? page;
+        page += 1;
       }
 
-      setSubCategories(Array.isArray(payload?.data?.subCategories) ? payload.data.subCategories : []);
+      setSubCategories(nextSubCategories);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to fetch subcategories.";
       toast.error(message);
@@ -399,12 +516,11 @@ export function AdminSubCategoryPage() {
                     <tr key={subCategory.id} className="border-b border-gray-100 last:border-b-0">
                       <td className="py-3">
                         <div className="relative h-10 w-10 overflow-hidden rounded-md bg-gray-100">
-                          <Image
-                            src={buildAssetUrl(API_BASE_URL, subCategory.imageUrl)}
-                            alt={subCategory.title}
-                            fill
-                            unoptimized
-                            className="object-cover"
+                          <ResilientSubCategoryImage
+                            key={`${subCategory.id}:${subCategory.imageUrl}`}
+                            apiBaseUrl={API_BASE_URL}
+                            imageUrl={subCategory.imageUrl}
+                            title={subCategory.title}
                           />
                         </div>
                       </td>

@@ -110,10 +110,22 @@ type ProductsListData = {
 };
 
 type CategoriesListData = {
+  meta?: {
+    page?: number;
+    limit?: number;
+    total?: number;
+    totalPage?: number;
+  };
   categories: CategoryItem[];
 };
 
 type SubCategoriesListData = {
+  meta?: {
+    page?: number;
+    limit?: number;
+    total?: number;
+    totalPage?: number;
+  };
   subCategories: SubCategoryItem[];
 };
 
@@ -162,6 +174,7 @@ const PRODUCT_STATUS_OPTIONS: ProductStatus[] = [
 ];
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "";
+const MAX_LIST_LIMIT = 100;
 
 const createEmptyVariant = (): ProductVariantInput => ({
   actualPrice: "",
@@ -308,17 +321,30 @@ export function AdminProductsPage() {
     if (!isApiReady) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/categories?page=1&limit=200`, {
-        method: "GET",
-      });
+      let page = 1;
+      let totalPage = 1;
+      const nextCategories: CategoryItem[] = [];
 
-      const payload = (await response.json()) as ApiResponse<CategoriesListData>;
+      while (page <= totalPage) {
+        const response = await fetch(`${API_BASE_URL}/categories?page=${page}&limit=${MAX_LIST_LIMIT}`, {
+          method: "GET",
+        });
 
-      if (!response.ok || !payload?.status) {
-        throw new Error(payload?.message || "Failed to fetch categories.");
+        const payload = (await response.json()) as ApiResponse<CategoriesListData>;
+
+        if (!response.ok || !payload?.status) {
+          throw new Error(payload?.message || "Failed to fetch categories.");
+        }
+
+        if (Array.isArray(payload?.data?.categories)) {
+          nextCategories.push(...payload.data.categories);
+        }
+
+        totalPage = payload?.data?.meta?.totalPage ?? page;
+        page += 1;
       }
 
-      setCategories(Array.isArray(payload?.data?.categories) ? payload.data.categories : []);
+      setCategories(nextCategories);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to fetch categories.";
       toast.error(message);
@@ -329,17 +355,30 @@ export function AdminProductsPage() {
     if (!isApiReady) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/subcategories?page=1&limit=500`, {
-        method: "GET",
-      });
+      let page = 1;
+      let totalPage = 1;
+      const nextSubCategories: SubCategoryItem[] = [];
 
-      const payload = (await response.json()) as ApiResponse<SubCategoriesListData>;
+      while (page <= totalPage) {
+        const response = await fetch(`${API_BASE_URL}/subcategories?page=${page}&limit=${MAX_LIST_LIMIT}`, {
+          method: "GET",
+        });
 
-      if (!response.ok || !payload?.status) {
-        throw new Error(payload?.message || "Failed to fetch subcategories.");
+        const payload = (await response.json()) as ApiResponse<SubCategoriesListData>;
+
+        if (!response.ok || !payload?.status) {
+          throw new Error(payload?.message || "Failed to fetch subcategories.");
+        }
+
+        if (Array.isArray(payload?.data?.subCategories)) {
+          nextSubCategories.push(...payload.data.subCategories);
+        }
+
+        totalPage = payload?.data?.meta?.totalPage ?? page;
+        page += 1;
       }
 
-      setSubCategories(Array.isArray(payload?.data?.subCategories) ? payload.data.subCategories : []);
+      setSubCategories(nextSubCategories);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to fetch subcategories.";
       toast.error(message);
@@ -724,6 +763,7 @@ export function AdminProductsPage() {
       toast.success(payload.message || (isEdit ? "Product updated successfully" : "Product created successfully"));
       closeFormModal();
       await fetchProducts();
+      window.dispatchEvent(new Event("readmart:storefront-updated"));
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to save product.";
       toast.error(message);
@@ -763,6 +803,7 @@ export function AdminProductsPage() {
 
       toast.success(payload.message || "Product copied successfully.");
       await fetchProducts();
+      window.dispatchEvent(new Event("readmart:storefront-updated"));
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to copy product.";
       toast.error(message);
@@ -803,6 +844,7 @@ export function AdminProductsPage() {
       toast.success(payload.message || "Product deleted successfully.");
       setProducts((prev) => prev.filter((item) => item.id !== product.id));
       setMeta((prev) => ({ ...prev, total: Math.max(prev.total - 1, 0) }));
+      window.dispatchEvent(new Event("readmart:storefront-updated"));
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to delete product.";
       toast.error(message);

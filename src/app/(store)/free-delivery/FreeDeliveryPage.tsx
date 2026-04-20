@@ -152,6 +152,7 @@ export function FreeDeliveryPage() {
                     imageUrl={imageUrl}
                     price={currentPrice}
                     previousPrice={previousPrice}
+                    to={`/product/${product.id}`}
                   />
                 );
               })}

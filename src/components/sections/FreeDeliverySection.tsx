@@ -99,6 +99,7 @@ export function FreeDeliverySection() {
                     imageUrl={imageUrl}
                     price={price}
                     previousPrice={previousPrice}
+                    to={`/product/${product.id}`}
                   />
                 );
               })}

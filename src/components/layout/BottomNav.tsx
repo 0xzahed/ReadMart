@@ -27,7 +27,7 @@ export function BottomNav() {
   ];
 
   return (
-    <nav className="fixed bottom-3 left-3 right-3 z-40 md:hidden">
+    <nav className="fixed bottom-3 left-3 right-3 z-40 pb-[env(safe-area-inset-bottom)] md:hidden">
       <div className="relative mx-auto flex max-w-md items-end justify-around rounded-[28px] border border-border/60 bg-background/95 px-2 pb-2 pt-3 shadow-[0_10px_30px_rgba(15,23,42,0.12)] backdrop-blur">
         <div className="pointer-events-none absolute -top-0.5 left-1/2 h-10 w-27 -translate-x-1/2 overflow-hidden">
           <div className="h-14 w-full -translate-y-8 rounded-full bg-background" />
@@ -49,7 +49,7 @@ export function BottomNav() {
                 key={item.label}
                 type="button"
                 onClick={() => setIsHelpModalOpen(true)}
-                className={`relative flex min-w-18.5 flex-1 flex-col items-center justify-center gap-1 px-2 py-1 text-xs font-medium transition-colors ${
+                className={`relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 px-1.5 py-1 text-[11px] font-medium transition-colors ${
                   isHelpActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -65,7 +65,7 @@ export function BottomNav() {
             <Link
               key={item.href}
               to={item.href}
-              className={`relative flex min-w-18.5 flex-1 flex-col items-center justify-center gap-1 px-2 py-1 text-xs font-medium transition-colors ${
+              className={`relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 px-1.5 py-1 text-[11px] font-medium transition-colors ${
                 isScan
                   ? "text-black"
                   : active || isHelpActive

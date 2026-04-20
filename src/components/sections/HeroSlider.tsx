@@ -50,6 +50,7 @@ export function HeroSlider() {
                     src={slider.image}
                     alt={slider.title}
                     fill
+                    unoptimized
                     className="object-cover"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
@@ -58,12 +59,23 @@ export function HeroSlider() {
                   />
                   <div className="absolute inset-0 bg-linear-to-r from-black/60 via-black/30 to-transparent" />
                   <div className="absolute inset-0 flex items-end px-6 pb-6 md:px-10 md:pb-8">
-                    <Link
-                      to={slider.buttonLink}
-                      className="inline-flex w-fit items-center justify-center rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-white/90 md:px-8 md:py-3 md:text-base"
-                    >
-                      Shop Now
-                    </Link>
+                    {/^https?:\/\//i.test(slider.buttonLink) ? (
+                      <a
+                        href={slider.buttonLink}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex w-fit items-center justify-center rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-white/90 md:px-8 md:py-3 md:text-base"
+                      >
+                        Shop Now
+                      </a>
+                    ) : (
+                      <Link
+                        to={slider.buttonLink}
+                        className="inline-flex w-fit items-center justify-center rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-white/90 md:px-8 md:py-3 md:text-base"
+                      >
+                        Shop Now
+                      </Link>
+                    )}
                   </div>
                 </div>
               </CarouselItem>

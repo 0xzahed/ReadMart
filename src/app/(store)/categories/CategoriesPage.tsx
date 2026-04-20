@@ -26,7 +26,7 @@ export function CategoriesPage() {
       </div>
 
       <div className="mx-auto w-full max-w-[1400px] px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4 xl:grid-cols-6">
           {activeCategories.map((category) => {
             const categoryCount = products.filter((product) => product.category === category.id).length;
 
@@ -39,7 +39,7 @@ export function CategoriesPage() {
                 <div className="relative aspect-square w-full overflow-hidden bg-secondary">
                   <Image src={category.image} alt={category.name} fill className="object-cover" />
                 </div>
-                <div className="p-3">
+                <div className="p-2.5 sm:p-3">
                   <h3 className="line-clamp-1 text-sm font-semibold text-foreground">{category.name}</h3>
                   <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
                     <span>{categoryCount} products</span>

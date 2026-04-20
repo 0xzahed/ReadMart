@@ -45,11 +45,21 @@ const buildAssetUrl = (apiBaseUrl: string, mediaUrl: string | null | undefined) 
   if (!mediaUrl) return "";
   if (/^https?:\/\//i.test(mediaUrl)) return mediaUrl;
 
+  const normalizedPath = mediaUrl.startsWith("/") ? mediaUrl : `/${mediaUrl}`;
+  const uploadPrefix = "/upload/";
+  const remainder = normalizedPath.startsWith(uploadPrefix)
+    ? normalizedPath.slice(uploadPrefix.length)
+    : "";
+  const candidatePath =
+    remainder && !remainder.includes("/")
+      ? `${uploadPrefix}banners/${remainder}`
+      : normalizedPath;
+
   try {
     const base = new URL(apiBaseUrl);
-    return `${base.protocol}//${base.host}${mediaUrl.startsWith("/") ? mediaUrl : `/${mediaUrl}`}`;
+    return `${base.protocol}//${base.host}${candidatePath}`;
   } catch {
-    return mediaUrl;
+    return candidatePath;
   }
 };
 
@@ -265,6 +275,7 @@ export function AdminBannerPage() {
       toast.success(payload.message || (isEdit ? "Banner updated successfully." : "Banner created successfully."));
       closeModal();
       await fetchBanners();
+      window.dispatchEvent(new Event("readmart:storefront-updated"));
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to save banner.";
       toast.error(message);
@@ -304,6 +315,7 @@ export function AdminBannerPage() {
 
       toast.success(payload.message || "Banner deleted successfully.");
       setBanners((prev) => prev.filter((item) => item.id !== banner.id));
+      window.dispatchEvent(new Event("readmart:storefront-updated"));
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to delete banner.";
       toast.error(message);
