@@ -26,7 +26,7 @@ export function MorePage() {
     <div className="min-h-screen bg-background">
       <StorePageHeader title="More" onBack={() => navigate(-1)} />
 
-      <div className="mx-auto w-full max-w-330 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+      <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
         <div className="rounded-2xl border border-border/70 bg-linear-to-r from-primary/10 via-primary/5 to-transparent p-5">
           <div className="flex items-center gap-3">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/15">

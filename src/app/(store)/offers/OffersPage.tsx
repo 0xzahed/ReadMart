@@ -25,7 +25,7 @@ export function OffersPage() {
     <div className="min-h-screen bg-background">
       <StorePageHeader title="Offers & Deals" onBack={() => navigate(-1)} />
 
-      <div className="mx-auto w-full max-w-330 px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
+      <div className="mx-auto w-full max-w-[1400px] px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
         {activeOfferSliders.length > 0 ? (
           <section>
             <div className="relative overflow-hidden rounded-2xl border border-border">

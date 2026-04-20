@@ -51,7 +51,7 @@ export function OrdersPage() {
     <div className="min-h-screen bg-background pb-20">
       <StorePageHeader title="My Orders" backTo="/" />
 
-      <div className="mx-auto w-full max-w-330 px-4 pt-4 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-[1400px] px-4 pt-4 sm:px-6 lg:px-8">
         <StoreCard className="space-y-3">
           <h3 className="font-semibold text-foreground">Check by Tracking Link</h3>
           <input
@@ -82,7 +82,7 @@ export function OrdersPage() {
 
       {/* Filter Tabs */}
       <div className="mt-4 border-b border-border">
-        <div className="mx-auto w-full max-w-330 overflow-x-auto px-4 py-3 scrollbar-hide sm:px-6 lg:px-8">
+        <div className="mx-auto w-full max-w-[1400px] overflow-x-auto px-4 py-3 scrollbar-hide sm:px-6 lg:px-8">
           <div className="flex gap-2">
           {(["all", "pending", "confirmed", "delivered", "cancelled"] as const).map((status) => (
             <button
@@ -103,7 +103,7 @@ export function OrdersPage() {
 
       {/* Orders List */}
       {filteredOrders.length === 0 ? (
-        <div className="mx-auto flex min-h-[60vh] w-full max-w-330 flex-col items-center justify-center px-4 py-20 text-center sm:px-6 lg:px-8">
+        <div className="mx-auto flex min-h-[60vh] w-full max-w-[1400px] flex-col items-center justify-center px-4 py-20 text-center sm:px-6 lg:px-8">
           <Package className="w-16 h-16 text-muted-foreground mb-4" />
           <p className="text-muted-foreground mb-4">No orders found</p>
           <StoreButton asChild size="lg">
@@ -111,7 +111,7 @@ export function OrdersPage() {
           </StoreButton>
         </div>
       ) : (
-        <div className="mx-auto grid w-full max-w-330 gap-4 px-4 py-5 sm:px-6 lg:grid-cols-2 lg:px-8 lg:py-8">
+        <div className="mx-auto grid w-full max-w-[1400px] gap-4 px-4 py-5 sm:px-6 lg:grid-cols-2 lg:px-8 lg:py-8">
           {filteredOrders.map((order) => (
             <StoreCard key={order.id} className="transition-shadow hover:shadow-md">
               <div className="flex items-start justify-between mb-3">

@@ -65,7 +65,7 @@ export function ExplorePage() {
         </div>
       </div>
 
-      <div className="mx-auto w-full max-w-330 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+      <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
         {/* Desktop search */}
         <div className="hidden lg:block mb-6">
           <h1 className="mb-4 text-3xl font-bold text-foreground">Explore Products</h1>

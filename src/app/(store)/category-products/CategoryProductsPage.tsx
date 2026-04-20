@@ -103,7 +103,7 @@ export function CategoryProductsPage() {
   return (
     <div className="min-h-screen bg-background pb-24 lg:pb-10">
       <div className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
-        <div className="mx-auto w-full max-w-330 px-4 py-3 sm:px-6 lg:px-8">
+        <div className="mx-auto w-full max-w-[1400px] px-4 py-3 sm:px-6 lg:px-8">
           <div className="mb-3 flex items-center gap-3">
             <button
               onClick={() => navigate(-1)}
@@ -127,7 +127,7 @@ export function CategoryProductsPage() {
         </div>
       </div>
 
-      <div className="mx-auto w-full max-w-330 px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
+      <div className="mx-auto w-full max-w-[1400px] px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
         <section className="mb-6">
           <h2 className="mb-3 text-base font-bold text-foreground md:text-lg">Sub Categories</h2>
           <Carousel

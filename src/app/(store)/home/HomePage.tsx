@@ -51,7 +51,7 @@ export function HomePage() {
 
       {trendingProducts.length > 0 ? (
         <section className="py-6 md:py-8 lg:py-10">
-          <div className="mx-auto w-full max-w-330 px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto w-full max-w-[1400px] px-4 sm:px-6 lg:px-8">
             <div className="mb-5 flex items-end justify-between">
               <h2 className="text-lg font-bold text-foreground md:text-2xl">Trending Products</h2>
               <Link to="/trending-products" className="text-sm font-medium text-primary hover:text-primary/80">
@@ -70,7 +70,7 @@ export function HomePage() {
 
       {newProducts.length > 0 ? (
         <section className="py-6 md:py-8 lg:py-10">
-          <div className="mx-auto w-full max-w-330 px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto w-full max-w-[1400px] px-4 sm:px-6 lg:px-8">
             <div className="mb-5 flex items-end justify-between">
               <h2 className="text-lg font-bold text-foreground md:text-2xl">New Products</h2>
               <Link to="/new-products" className="text-sm font-medium text-primary hover:text-primary/80">
@@ -89,7 +89,7 @@ export function HomePage() {
 
       {categoryProductGroups.map(({ category, products: categoryProducts }) => (
         <section key={category.id} className="py-6 md:py-8 lg:py-10">
-          <div className="mx-auto w-full max-w-330 px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto w-full max-w-[1400px] px-4 sm:px-6 lg:px-8">
             <div className="mb-5 flex items-end justify-between">
               <h2 className="text-lg font-bold text-foreground md:text-2xl">{category.name} Products</h2>
               <Link

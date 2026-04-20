@@ -30,7 +30,7 @@ export function SearchPage() {
     <div className="min-h-screen bg-background pb-24 lg:pb-10">
       {/* Header */}
       <div className="sticky top-0 z-40 bg-background/95 backdrop-blur border-b border-border">
-        <div className="mx-auto flex w-full max-w-330 items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
+        <div className="mx-auto flex w-full max-w-[1400px] items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
           <button
             onClick={() => navigate(-1)}
             className="p-2 text-foreground"
@@ -54,7 +54,7 @@ export function SearchPage() {
       </div>
 
       {/* Results */}
-      <div className="mx-auto w-full max-w-330 px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
+      <div className="mx-auto w-full max-w-[1400px] px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm text-muted-foreground">
             {filteredProducts.length} product{filteredProducts.length !== 1 ? "s" : ""} found

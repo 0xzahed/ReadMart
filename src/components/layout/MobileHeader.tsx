@@ -132,7 +132,7 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
 
       </div>
 
-      <div className="mx-auto hidden w-full max-w-330 items-center gap-6 px-6 py-4 lg:flex">
+      <div className="mx-auto hidden w-full max-w-[1400px] items-center gap-6 px-6 py-4 lg:flex">
         <Link to="/" className="text-2xl font-black tracking-tight text-primary">
           ReadMart
         </Link>

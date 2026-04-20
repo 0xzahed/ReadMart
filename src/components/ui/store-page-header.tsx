@@ -26,7 +26,7 @@ export function StorePageHeader({
 }: StorePageHeaderProps) {
   return (
     <header className={cn("sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur", className)}>
-      <div className="mx-auto flex w-full max-w-330 items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+      <div className="mx-auto flex w-full max-w-[1400px] items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
         <div className="flex min-w-0 items-center gap-3">
           {backTo ? (
             <StoreButton asChild tone="ghost" size="icon" className="hover:bg-transparent" aria-label="Go back">

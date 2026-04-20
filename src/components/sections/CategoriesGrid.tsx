@@ -18,7 +18,7 @@ export function CategoriesGrid({ maxVisible = 6 }: CategoriesGridProps) {
 
   return (
     <section className="py-6 md:py-8 lg:py-9">
-      <div className="mx-auto w-full max-w-330 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-[1400px] px-4 sm:px-6 lg:px-8">
         <div className="mb-5 flex items-end justify-between">
           <h2 className="text-lg font-bold text-foreground md:text-2xl">Categories</h2>
           {hasMore ? (

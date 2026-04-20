@@ -28,6 +28,8 @@ import { AdminBannerPage } from "@/app/(admin)/banner/AdminBannerPage";
 import { AdminCategoryPage } from "@/app/(admin)/category/AdminCategoryPage";
 import { AdminProductsPage } from "@/app/(admin)/products/AdminProductsPage";
 import { AdminSubCategoryPage } from "@/app/(admin)/subcategory/AdminSubCategoryPage";
+import { AdminFlashSalePage } from "@/app/(admin)/flash-sale/AdminFlashSalePage";
+import { AdminFreeDeliveryPage } from "@/app/(admin)/free-delivery/AdminFreeDeliveryPage";
 import { SectionHeading } from "@/components/admin/SectionHeading";
 import { MetricCard } from "@/components/admin/MetricCard";
 import {
@@ -1401,85 +1403,15 @@ function BannerListManagement() {
 }
 
 function FlashSaleManagement() {
-  const { products, updateProduct } = useStore();
-  const [searchText, setSearchText] = useState("");
-
-  const flashProducts = products.filter((product) => {
-    if (!product.isFlashDeal) return false;
-    if (!searchText.trim()) return true;
-    const keyword = searchText.toLowerCase();
-    return product.name.toLowerCase().includes(keyword);
-  });
-
-  const removeFlashDeal = (productId: string) => {
-    updateProduct(productId, { isFlashDeal: false, discountPercent: 0 });
-    toast.success("Removed from flash sale");
-  };
-
-  return (
-    <div className="space-y-4">
-      <SectionHeading title="Flash Sale" />
-
-      <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-        <div className="relative mb-4 max-w-sm">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-          <input
-            value={searchText}
-            onChange={(event) => setSearchText(event.target.value)}
-            placeholder="Search product"
-            className="h-10 w-full rounded-lg border border-gray-200 bg-gray-50 pl-9 pr-3 text-sm text-gray-700 outline-none transition focus:border-primary"
-          />
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-190 text-left text-sm">
-            <thead>
-              <tr className="border-b border-gray-200 text-xs uppercase tracking-wide text-gray-500">
-                <th className="pb-3 font-medium">Name</th>
-                <th className="pb-3 font-medium">Price</th>
-                <th className="pb-3 font-medium">Original</th>
-                <th className="pb-3 font-medium">Discount</th>
-                <th className="pb-3 text-right font-medium">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {flashProducts.map((product) => (
-                <tr key={product.id} className="border-b border-gray-100 last:border-b-0">
-                  <td className="py-3 font-medium text-gray-900">{product.name}</td>
-                  <td className="py-3 text-gray-700">{formatCurrency(product.price)}</td>
-                  <td className="py-3 text-gray-700">{formatCurrency(product.originalPrice)}</td>
-                  <td className="py-3 text-gray-700">{product.discountPercent}%</td>
-                  <td className="py-3">
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        type="button"
-                        onClick={() => removeFlashDeal(product.id)}
-                        className="rounded-md border border-rose-200 p-2 text-rose-500 transition-colors hover:bg-rose-50"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {flashProducts.length === 0 && (
-          <p className="py-8 text-center text-sm text-gray-500">No product in flash sale.</p>
-        )}
-      </div>
-    </div>
-  );
+  return <AdminFlashSalePage />;
 }
 
 function FreeDeliveryManagement() {
-  return <ProductSelectionManagement title="Free Delivery" />;
+  return <AdminFreeDeliveryPage />;
 }
 
 function FreeCategoryDeliveryManagement() {
-  return <CategorySelectionManagement title="Free Category Delivery" />;
+  return <AdminFreeDeliveryPage />;
 }
 
 function TagCategoryManagement() {
@@ -1608,34 +1540,6 @@ export function AdminDashboardPage() {
       default:
         return (
           <div className="space-y-6">
-            <section className="relative overflow-hidden rounded-4xl border border-slate-200/70 bg-linear-to-br from-slate-950 via-slate-900 to-slate-800 p-6 text-white shadow-[0_28px_80px_rgba(15,23,42,0.22)]">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.22),transparent_26%),radial-gradient(circle_at_bottom_left,rgba(99,102,241,0.28),transparent_30%)]" />
-              <div className="relative flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
-                <div className="max-w-2xl">
-                  <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-300">ReadMart Command Center</p>
-                  <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">Business Overview</h2>
-                  <p className="mt-3 max-w-xl text-sm leading-6 text-slate-300 sm:text-base">
-                    Quick performance snapshot across your core admin operations with the same live numbers,
-                    wrapped in a cleaner and more premium dashboard experience.
-                  </p>
-                </div>
-                <div className="grid gap-3 sm:grid-cols-3 xl:min-w-105">
-                  <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
-                    <p className="text-xs uppercase tracking-[0.22em] text-slate-300">Revenue</p>
-                    <p className="mt-2 text-2xl font-bold text-white">{formatCurrency(totalRevenue)}</p>
-                  </div>
-                  <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
-                    <p className="text-xs uppercase tracking-[0.22em] text-slate-300">Orders</p>
-                    <p className="mt-2 text-2xl font-bold text-white">{orders.length}</p>
-                  </div>
-                  <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
-                    <p className="text-xs uppercase tracking-[0.22em] text-slate-300">Customers</p>
-                    <p className="mt-2 text-2xl font-bold text-white">{customerCount}</p>
-                  </div>
-                </div>
-              </div>
-            </section>
-
             <SectionHeading
               title="Performance Cards"
               subtitle="All existing dashboard functionality remains unchanged, only the presentation has been refreshed."

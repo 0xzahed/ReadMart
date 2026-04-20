@@ -14,7 +14,7 @@ export function CategoriesPage() {
   return (
     <div className="min-h-screen bg-background pb-24 lg:pb-10">
       <div className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-330 items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
+        <div className="mx-auto flex w-full max-w-[1400px] items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
           <button
             onClick={() => navigate(-1)}
             className="p-2 text-foreground"
@@ -25,7 +25,7 @@ export function CategoriesPage() {
         </div>
       </div>
 
-      <div className="mx-auto w-full max-w-330 px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
+      <div className="mx-auto w-full max-w-[1400px] px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
           {activeCategories.map((category) => {
             const categoryCount = products.filter((product) => product.category === category.id).length;

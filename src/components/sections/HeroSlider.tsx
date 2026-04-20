@@ -15,7 +15,6 @@ export function HeroSlider() {
 
   useEffect(() => {
     if (!api) return;
-    setCurrentIndex(api.selectedScrollSnap());
     const onSelect = () => setCurrentIndex(api.selectedScrollSnap());
     api.on("select", onSelect);
     api.on("reInit", onSelect);
@@ -37,7 +36,7 @@ export function HeroSlider() {
 
   return (
     <section className="relative w-full overflow-hidden pt-3 md:pt-4 lg:pt-6">
-      <div className="mx-auto w-full px-2 sm:px-4 lg:px-8 md:max-w-[480px]">
+      <div className="mx-auto w-full max-w-[1400px] px-4 sm:px-6 lg:px-8">
         <Carousel
           setApi={setApi}
           opts={{ align: "start", loop: true }}

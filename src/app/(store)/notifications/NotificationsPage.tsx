@@ -11,7 +11,7 @@ export function NotificationsPage() {
     <div className="min-h-screen bg-background pb-24">
       <StorePageHeader title="Notifications" backTo="/" />
 
-      <div className="mx-auto w-full max-w-330 space-y-4 px-4 pt-4 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-[1400px] space-y-4 px-4 pt-4 sm:px-6 lg:px-8">
         {unreadNotificationCount > 0 ? (
           <StoreButton tone="secondary" onClick={markAllNotificationsAsRead} fullWidth>
             Mark All as Read

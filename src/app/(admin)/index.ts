@@ -10,3 +10,5 @@ export { AdminManageAdminsPage } from "./manage-admins/AdminManageAdminsPage";
 export { AdminCategoryPage } from "./category/AdminCategoryPage";
 export { AdminSubCategoryPage } from "./subcategory/AdminSubCategoryPage";
 export { AdminBannerPage } from "./banner/AdminBannerPage";
+export { AdminFlashSalePage } from "./flash-sale/AdminFlashSalePage";
+export { AdminFreeDeliveryPage } from "./free-delivery/AdminFreeDeliveryPage";

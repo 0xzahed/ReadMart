@@ -145,7 +145,7 @@ export function CartPage() {
     return (
       <div className="min-h-screen bg-background">
         <StorePageHeader title="Cart" onBack={() => navigate(-1)} />
-        <div className="mx-auto flex min-h-[60vh] w-full max-w-330 flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex min-h-[60vh] w-full max-w-[1400px] flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <p className="text-muted-foreground mb-4">Your cart is empty</p>
             <StoreButton asChild size="lg">
@@ -170,7 +170,7 @@ export function CartPage() {
       />
 
       {/* Cart Items */}
-      <div className="mx-auto w-full max-w-330 px-4 py-5 space-y-4 sm:px-6 lg:px-8 lg:py-8">
+      <div className="mx-auto w-full max-w-[1400px] px-4 py-5 space-y-4 sm:px-6 lg:px-8 lg:py-8">
         {cartItems.map((item) => (
           <StoreCard key={item.productId}>
             <div className="flex gap-3">
@@ -246,7 +246,7 @@ export function CartPage() {
       </div>
 
       {/* Promo Code */}
-      <div className="mx-auto w-full max-w-330 px-4 py-4 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-[1400px] px-4 py-4 sm:px-6 lg:px-8">
         <StoreCard>
           <h3 className="font-semibold text-foreground mb-3">Promo Code</h3>
           <div className="flex gap-2">
@@ -276,7 +276,7 @@ export function CartPage() {
       </div>
 
       {/* Order Summary */}
-      <div className="mx-auto w-full max-w-330 px-4 py-4 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-[1400px] px-4 py-4 sm:px-6 lg:px-8">
         <StoreCard className="space-y-3">
           <h3 className="font-semibold text-foreground">Order Summary</h3>
           <div className="space-y-2 text-sm">
@@ -306,7 +306,7 @@ export function CartPage() {
 
       {/* Checkout Button */}
       <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border p-4 z-40 md:pb-20">
-        <div className="mx-auto w-full max-w-330">
+        <div className="mx-auto w-full max-w-[1400px]">
           <StoreButton
             onClick={() => setShowCheckout(true)}
             fullWidth

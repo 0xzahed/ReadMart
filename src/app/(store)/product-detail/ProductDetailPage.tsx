@@ -117,7 +117,7 @@ export function ProductDetailPage() {
     <div className="min-h-screen bg-background pb-32">
       {/* Top Navigation */}
       <div className="sticky top-0 z-40 bg-background/95 backdrop-blur border-b border-border">
-        <div className="mx-auto flex w-full max-w-330 items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+        <div className="mx-auto flex w-full max-w-[1400px] items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           <button
             onClick={() => navigate(-1)}
             className="p-2 text-foreground"
@@ -145,7 +145,7 @@ export function ProductDetailPage() {
         </div>
       )}
 
-      <div className="mx-auto w-full max-w-330 lg:px-8">
+      <div className="mx-auto w-full max-w-[1400px] lg:px-8">
         <div className="lg:grid lg:grid-cols-[1fr_1fr] lg:gap-8 lg:py-8">
           <div>
             {/* Product Images */}
@@ -302,7 +302,7 @@ export function ProductDetailPage() {
       {/* Related Products */}
       {relatedProducts.length > 0 && (
         <section className="border-t border-border py- lg:py-8">
-          <div className="mx-auto w-full max-w-330 px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto w-full max-w-[1400px] px-4 sm:px-6 lg:px-8">
           <div className="mb-4">
             <h2 className="text-lg font-bold text-foreground">Related Products</h2>
           </div>
@@ -319,7 +319,7 @@ export function ProductDetailPage() {
 
       {/* Fixed Bottom Actions */}
       <div className="fixed bottom-0 left-0 right-0 p-4 z-40 md:pb-20">
-        <div className="mx-auto w-full max-w-330 relative">
+        <div className="mx-auto w-full max-w-[1400px] relative">
           <button
             onClick={handleWhatsAppShare}
             aria-label="Share on WhatsApp"

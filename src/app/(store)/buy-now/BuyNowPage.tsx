@@ -78,7 +78,7 @@ export function BuyNowPage() {
     <div className="min-h-screen bg-background pb-24">
       <StorePageHeader title="Buy Product" onBack={() => navigate(-1)} />
 
-      <div className="mx-auto w-full max-w-330 space-y-4 px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
+      <div className="mx-auto w-full max-w-[1400px] space-y-4 px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
         <StoreCard>
           <div className="flex items-center gap-3">
             <div className="relative h-20 w-20 overflow-hidden rounded-lg bg-secondary">
