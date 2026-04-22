@@ -3,6 +3,7 @@
 import { ReactNode, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { BottomNav } from "@/components/layout/BottomNav";
+// import BottomNav from "@/components/layout/BottomNav";
 
 interface StoreLayoutProps {
   children: ReactNode;

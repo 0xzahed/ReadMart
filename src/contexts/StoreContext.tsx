@@ -196,6 +196,7 @@ type SubCategoryApiItem = {
   id: string;
   categoryId: string;
   title: string;
+  imageUrl?: string;
 };
 
 type SubCategoryListApiData = {

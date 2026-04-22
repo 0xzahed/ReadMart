@@ -1,150 +1,238 @@
 "use client";
 
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Home, Headset, ScanLine, BadgePercent, Menu } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Home, ScanLine } from "lucide-react";
+import React, { useState } from "react";
+import { RiCustomerService2Line } from "react-icons/ri";
+import { BiSolidOffer } from "react-icons/bi";
+import { FiMenu } from "react-icons/fi";
 
 export function BottomNav() {
-  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
-  const location = useLocation();
-  if (location.pathname.startsWith("/product/")) {
-    return null;
-  }
-
-  const isActive = (path: string) => {
-    if (path === "/" && location.pathname === "/") return true;
-    if (path !== "/" && location.pathname.startsWith(path)) return true;
-    return false;
-  };
+  const scannerIndex = 2;
+  const [activeIconIndex, setActiveIconIndex] = useState(scannerIndex);
 
   const navItems = [
-    { icon: Home, label: "Home", href: "/" },
-    { icon: Headset, label: "Help", href: "/chat" },
-    { icon: ScanLine, label: "Scan", href: "/scan" },
-    { icon: BadgePercent, label: "Offer", href: "/offers" },
-    { icon: Menu, label: "More", href: "/more" },
+    { label: "Home", Icon: Home },
+    { label: "Help", Icon: RiCustomerService2Line },
+    { label: "Scanner", Icon: ScanLine },
+    { label: "Offer", Icon: BiSolidOffer },
+    { label: "More", Icon: FiMenu },
   ];
 
+  const IndicatorIcon = ScanLine;
+
   return (
-    <nav className="fixed bottom-3 left-3 right-3 z-40 pb-[env(safe-area-inset-bottom)] md:hidden">
-      <div className="relative mx-auto flex max-w-md items-end justify-around rounded-[28px] border border-border/60 bg-background/95 px-2 pb-2 pt-3 shadow-[0_10px_30px_rgba(15,23,42,0.12)] backdrop-blur">
-        <div className="pointer-events-none absolute -top-0.5 left-1/2 h-10 w-27 -translate-x-1/2 overflow-hidden">
-          <div className="h-14 w-full -translate-y-8 rounded-full bg-background" />
-        </div>
-        <div className="pointer-events-none absolute top-1 left-[calc(50%-58px)] h-4 w-4 rounded-full bg-background" />
-        <div className="pointer-events-none absolute top-1 left-[calc(50%+42px)] h-4 w-4 rounded-full bg-background" />
-        {navItems.map((item) => {
-          const active = isActive(item.href);
-          const Icon = item.icon;
-          const isScan = item.label === "Scan";
-          const isHome = item.label === "Home";
-          const isOffer = item.label === "Offer";
-          const isHelp = item.label === "Help";
-          const isHelpActive = isHelp && isHelpModalOpen;
+    <>
+      {/* CSS */}
+      <style>{`
+        @import url('https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900');
 
-          if (isHelp) {
-            return (
-              <button
-                key={item.label}
-                type="button"
-                onClick={() => setIsHelpModalOpen(true)}
-                className={`relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 px-1.5 py-1 text-[11px] font-medium transition-colors ${
-                  isHelpActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <div className="relative">
-                  <Icon className="h-6 w-6" />
-                </div>
-                <span className="truncate">{item.label}</span>
-              </button>
-            );
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+          font-family: 'Poppins', sans-serif;
+        }
+
+        :root {
+          --clr: #f7f7f7;
+          --item-size: 70px;
+          --item-gap: 8px;
+        }
+
+        body {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+          background: var(--clr);
+        }
+
+        .navigation {
+          position: relative;
+          width: 400px;
+          height: 70px;
+          background: #ffffff; /* ✅ white navbar */
+          display: none;
+          justify-content: center;
+          align-items: center;
+          border-radius: 10px;
+          box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 768px) {
+          .navigation {
+            display: flex;
           }
+        }
 
-          return (
-            <Link
-              key={item.href}
-              to={item.href}
-              className={`relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 px-1.5 py-1 text-[11px] font-medium transition-colors ${
-                isScan
-                  ? "text-black"
-                  : active || isHelpActive
-                    ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground"
+        .navigation ul {
+          display: flex;
+          width: calc((var(--item-size) * 5) + (var(--item-gap) * 4));
+          gap: var(--item-gap);
+        }
+
+        .navigation ul li {
+          position: relative;
+          list-style: none;
+          width: var(--item-size);
+          height: var(--item-size);
+          z-index: 1;
+        }
+
+        .navigation ul li .nav-button {
+          position: relative;
+          display: flex;
+          justify-content: flex-start;
+          align-items: center;
+          flex-direction: column;
+          width: 100%;
+          height: 100%;
+          padding-top: 12px;
+          gap: 6px;
+          border: 0;
+          background: transparent;
+          cursor: pointer;
+          text-align: center;
+          font-weight: 500;
+        }
+
+        .navigation ul li .nav-button .icon {
+          line-height: 1;
+          transition: 0.35s;
+          color: #333; /* ✅ dark icon */
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .navigation ul li .nav-button .icon.icon-active {
+          color: #3b82f6;
+        }
+
+        .navigation ul li:hover .nav-button .icon {
+          transform: translateY(-3px);
+        }
+
+        .navigation ul li.active .nav-button .icon {
+          opacity: 0;
+        }
+
+        .navigation ul li .nav-button .text {
+          position: static;
+          color: #333; /* ✅ dark text */
+          font-size: 0.7em;
+          letter-spacing: 0.03em;
+          line-height: 1;
+          transition: color 0.3s;
+          opacity: 1;
+          transform: none;
+        }
+
+        .navigation ul li.active .nav-button .text {
+          color: #333;
+          font-weight: 500;
+        }
+
+        .indicator {
+          position: absolute;
+          top: -50%;
+          width: var(--item-size);
+          height: var(--item-size);
+          background: #ffffff;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border-radius: 50%;
+          border: 6px solid var(--clr);
+          transition: 0.5s;
+        }
+
+        .indicator .indicator-icon {
+          color: #080000;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          line-height: 1;
+          z-index: 2;
+        }
+
+        .indicator .indicator-icon.icon-active {
+          color: #3b82f6;
+        }
+
+        .indicator::before {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: -22px;
+          width: 20px;
+          height: 20px;
+          border-top-right-radius: 20px;
+          box-shadow: 0px -10px 0 0 var(--clr);
+        }
+
+        .indicator::after {
+          content: '';
+          position: absolute;
+          top: 50%;
+          right: -22px;
+          width: 20px;
+          height: 20px;
+          border-top-left-radius: 20px;
+          box-shadow: 0px -10px 0 0 var(--clr);
+        }
+
+        .navigation ul li:nth-child(1).active ~ .indicator {
+          transform: translateX(0px);
+        }
+        .navigation ul li:nth-child(2).active ~ .indicator {
+          transform: translateX(calc(var(--item-size) + var(--item-gap)));
+        }
+        .navigation ul li:nth-child(3).active ~ .indicator {
+          transform: translateX(calc((var(--item-size) + var(--item-gap)) * 2));
+        }
+        .navigation ul li:nth-child(4).active ~ .indicator {
+          transform: translateX(calc((var(--item-size) + var(--item-gap)) * 3));
+        }
+        .navigation ul li:nth-child(5).active ~ .indicator {
+          transform: translateX(calc((var(--item-size) + var(--item-gap)) * 4));
+        }
+      `}</style>
+
+      {/* HTML */}
+      <div className="navigation">
+        <ul>
+          {navItems.map(({ label, Icon }, index) => (
+            <li
+              key={label}
+              className={`list ${scannerIndex === index ? "active" : ""}`}
+            >
+              <button
+                type="button"
+                className="nav-button"
+                onClick={() => setActiveIconIndex(index)}
+              >
+                <span
+                  className={`icon ${activeIconIndex === index ? "icon-active" : ""}`}
+                >
+                  <Icon size={22} />
+                </span>
+                <span className="text">{label}</span>
+              </button>
+            </li>
+          ))}
+
+          <div className="indicator">
+            <span
+              className={`indicator-icon ${
+                activeIconIndex === scannerIndex ? "icon-active" : ""
               }`}
             >
-              {isScan ? (
-                <>
-                  <div className="-mt-10 mb-1 flex h-14 w-14 items-center justify-center rounded-full border-[5px] border-background bg-[#2f78d4] text-white shadow-[0_10px_20px_rgba(0,0,0,0.22)]">
-                    <Icon className="h-6 w-6" />
-                  </div>
-                  <span className="truncate text-muted-foreground">{item.label}</span>
-                </>
-              ) : (
-                <>
-                  <div
-                    className={`relative ${
-                      isOffer ? "flex h-8 w-8 items-center justify-center rounded-full" : ""
-                    } ${isOffer && active ? "bg-primary" : ""}`}
-                  >
-                    <Icon
-                      className={
-                        isOffer
-                          ? `h-6 w-6 ${active ? "text-white" : "text-muted-foreground"}`
-                          : `h-6 w-6 ${active ? "fill-current" : ""}`
-                      }
-                    />
-                    {isHome && active && (
-                        <span className="absolute bottom-0.75 left-1/2 h-2.25 w-1.5 -translate-x-1/2 rounded-sm bg-background" />
-                    )}
-                  </div>
-                  <span className="truncate">{item.label}</span>
-                </>
-              )}
-            </Link>
-          );
-        })}
-      </div>
-
-      <Dialog open={isHelpModalOpen} onOpenChange={setIsHelpModalOpen}>
-        <DialogContent className="max-w-85 rounded-2xl p-5">
-          <DialogHeader className="text-left">
-            <DialogTitle>Help & Support</DialogTitle>
-            <DialogDescription>Choose a channel to contact us quickly.</DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-2 pt-1">
-            <a
-              href="https://wa.me/"
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center justify-between rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium transition-colors hover:bg-muted/40"
-            >
-              <span>WhatsApp</span>
-              <span className="text-xs text-muted-foreground">Open</span>
-            </a>
-
-            <Link
-              to="/chat"
-              onClick={() => setIsHelpModalOpen(false)}
-              className="flex items-center justify-between rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium transition-colors hover:bg-muted/40"
-            >
-              <span>Live Chat</span>
-              <span className="text-xs text-muted-foreground">Open</span>
-            </Link>
-
-            <a
-              href="https://m.me/"
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center justify-between rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium transition-colors hover:bg-muted/40"
-            >
-              <span>Messenger</span>
-              <span className="text-xs text-muted-foreground">Open</span>
-            </a>
+              <IndicatorIcon size={22} />
+            </span>
           </div>
-        </DialogContent>
-      </Dialog>
-    </nav>
+        </ul>
+      </div>
+    </>
   );
 }
