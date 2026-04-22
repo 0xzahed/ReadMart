@@ -3,7 +3,6 @@
 import { ReactNode, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { BottomNav } from "@/components/layout/BottomNav";
-// import BottomNav from "@/components/layout/BottomNav";
 
 interface StoreLayoutProps {
   children: ReactNode;
@@ -20,7 +19,7 @@ export function StoreLayout({ children }: StoreLayoutProps) {
   }, [location.pathname, location.search]);
 
   return (
-    <div className="min-h-screen overflow-x-clip bg-background pb-[calc(6rem+env(safe-area-inset-bottom))] md:pb-0">
+    <div className="min-h-screen overflow-x-hidden bg-background pb-[calc(6rem+env(safe-area-inset-bottom))] md:pb-0">
       {children}
       <BottomNav />
     </div>
