@@ -5,73 +5,72 @@ import React, { useState } from "react";
 import { RiCustomerService2Line } from "react-icons/ri";
 import { BiSolidOffer } from "react-icons/bi";
 import { FiMenu } from "react-icons/fi";
+import { Link } from "react-router-dom";
 
 export function BottomNav() {
   const scannerIndex = 2;
   const [activeIconIndex, setActiveIconIndex] = useState(scannerIndex);
 
   const navItems = [
-    { label: "Home", Icon: Home },
-    { label: "Help", Icon: RiCustomerService2Line },
-    { label: "Scanner", Icon: ScanLine },
-    { label: "Offer", Icon: BiSolidOffer },
-    { label: "More", Icon: FiMenu },
+    { label: "Home", Icon: Home, path: "/" },
+    { label: "Help", Icon: RiCustomerService2Line, path: "/chat" },
+    { label: "Scanner", Icon: ScanLine, path: "/scan" },
+    { label: "Offer", Icon: BiSolidOffer, path: "/offers" },
+    { label: "More", Icon: FiMenu, path: "/more" },
   ];
 
   const IndicatorIcon = ScanLine;
 
   return (
-    <>
-      {/* CSS */}
+    <div className="rm-bottom-nav fixed inset-x-0 bottom-3 z-50 px-2 md:hidden" aria-label="Bottom navigation">
       <style>{`
         @import url('https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900');
 
-        * {
+        .rm-bottom-nav {
+          --clr: #f7f7f7;
+          --item-size: 70px;
+          --item-gap: 8px;
+          --nav-width: 400px;
+          --nav-scale: min(1, calc((100vw - 16px) / var(--nav-width)));
+        }
+
+        .rm-bottom-nav * {
           margin: 0;
           padding: 0;
           box-sizing: border-box;
           font-family: 'Poppins', sans-serif;
         }
 
-        :root {
-          --clr: #f7f7f7;
-          --item-size: 70px;
-          --item-gap: 8px;
-        }
-
-        body {
+        .rm-bottom-nav .navigation-shell {
+          width: var(--nav-width);
+          height: calc(var(--item-size) * var(--nav-scale));
+          margin-inline: auto;
           display: flex;
+          align-items: flex-start;
           justify-content: center;
-          align-items: center;
-          min-height: 100vh;
-          background: var(--clr);
         }
 
-        .navigation {
+        .rm-bottom-nav .navigation {
           position: relative;
-          width: 400px;
-          height: 70px;
-          background: #ffffff; /* ✅ white navbar */
-          display: none;
+          width: var(--nav-width);
+          height: var(--item-size);
+          background: #ffffff;
+          display: flex;
           justify-content: center;
           align-items: center;
           border-radius: 10px;
           box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+          transform: scale(var(--nav-scale));
+          transform-origin: top center;
         }
 
-        @media (max-width: 768px) {
-          .navigation {
-            display: flex;
-          }
-        }
-
-        .navigation ul {
+        .rm-bottom-nav .navigation ul {
           display: flex;
           width: calc((var(--item-size) * 5) + (var(--item-gap) * 4));
           gap: var(--item-gap);
         }
 
-        .navigation ul li {
+        .rm-bottom-nav .navigation ul li {
           position: relative;
           list-style: none;
           width: var(--item-size);
@@ -79,7 +78,7 @@ export function BottomNav() {
           z-index: 1;
         }
 
-        .navigation ul li .nav-button {
+        .rm-bottom-nav .navigation ul li .nav-button {
           position: relative;
           display: flex;
           justify-content: flex-start;
@@ -94,32 +93,33 @@ export function BottomNav() {
           cursor: pointer;
           text-align: center;
           font-weight: 500;
+          text-decoration: none;
         }
 
-        .navigation ul li .nav-button .icon {
+        .rm-bottom-nav .navigation ul li .nav-button .icon {
           line-height: 1;
           transition: 0.35s;
-          color: #333; /* ✅ dark icon */
+          color: #333;
           display: inline-flex;
           align-items: center;
           justify-content: center;
         }
 
-        .navigation ul li .nav-button .icon.icon-active {
+        .rm-bottom-nav .navigation ul li .nav-button .icon.icon-active {
           color: #3b82f6;
         }
 
-        .navigation ul li:hover .nav-button .icon {
+        .rm-bottom-nav .navigation ul li:hover .nav-button .icon {
           transform: translateY(-3px);
         }
 
-        .navigation ul li.active .nav-button .icon {
+        .rm-bottom-nav .navigation ul li.active .nav-button .icon {
           opacity: 0;
         }
 
-        .navigation ul li .nav-button .text {
+        .rm-bottom-nav .navigation ul li .nav-button .text {
           position: static;
-          color: #333; /* ✅ dark text */
+          color: #333;
           font-size: 0.7em;
           letter-spacing: 0.03em;
           line-height: 1;
@@ -128,12 +128,12 @@ export function BottomNav() {
           transform: none;
         }
 
-        .navigation ul li.active .nav-button .text {
+        .rm-bottom-nav .navigation ul li.active .nav-button .text {
           color: #333;
           font-weight: 500;
         }
 
-        .indicator {
+        .rm-bottom-nav .indicator {
           position: absolute;
           top: -50%;
           width: var(--item-size);
@@ -147,7 +147,7 @@ export function BottomNav() {
           transition: 0.5s;
         }
 
-        .indicator .indicator-icon {
+        .rm-bottom-nav .indicator .indicator-icon {
           color: #080000;
           display: inline-flex;
           align-items: center;
@@ -156,11 +156,11 @@ export function BottomNav() {
           z-index: 2;
         }
 
-        .indicator .indicator-icon.icon-active {
+        .rm-bottom-nav .indicator .indicator-icon.icon-active {
           color: #3b82f6;
         }
 
-        .indicator::before {
+        .rm-bottom-nav .indicator::before {
           content: '';
           position: absolute;
           top: 50%;
@@ -171,7 +171,7 @@ export function BottomNav() {
           box-shadow: 0px -10px 0 0 var(--clr);
         }
 
-        .indicator::after {
+        .rm-bottom-nav .indicator::after {
           content: '';
           position: absolute;
           top: 50%;
@@ -182,57 +182,62 @@ export function BottomNav() {
           box-shadow: 0px -10px 0 0 var(--clr);
         }
 
-        .navigation ul li:nth-child(1).active ~ .indicator {
+        .rm-bottom-nav .navigation ul li:nth-child(1).active ~ .indicator {
           transform: translateX(0px);
         }
-        .navigation ul li:nth-child(2).active ~ .indicator {
+
+        .rm-bottom-nav .navigation ul li:nth-child(2).active ~ .indicator {
           transform: translateX(calc(var(--item-size) + var(--item-gap)));
         }
-        .navigation ul li:nth-child(3).active ~ .indicator {
+
+        .rm-bottom-nav .navigation ul li:nth-child(3).active ~ .indicator {
           transform: translateX(calc((var(--item-size) + var(--item-gap)) * 2));
         }
-        .navigation ul li:nth-child(4).active ~ .indicator {
+
+        .rm-bottom-nav .navigation ul li:nth-child(4).active ~ .indicator {
           transform: translateX(calc((var(--item-size) + var(--item-gap)) * 3));
         }
-        .navigation ul li:nth-child(5).active ~ .indicator {
+
+        .rm-bottom-nav .navigation ul li:nth-child(5).active ~ .indicator {
           transform: translateX(calc((var(--item-size) + var(--item-gap)) * 4));
         }
       `}</style>
 
-      {/* HTML */}
-      <div className="navigation">
-        <ul>
-          {navItems.map(({ label, Icon }, index) => (
-            <li
-              key={label}
-              className={`list ${scannerIndex === index ? "active" : ""}`}
-            >
-              <button
-                type="button"
-                className="nav-button"
-                onClick={() => setActiveIconIndex(index)}
+      <div className="navigation-shell">
+        <div className="navigation">
+          <ul>
+            {navItems.map(({ label, Icon, path }, index) => (
+              <li
+                key={label}
+                className={`list ${scannerIndex === index ? "active" : ""}`}
               >
-                <span
-                  className={`icon ${activeIconIndex === index ? "icon-active" : ""}`}
+                <Link
+                  to={path}
+                  className="nav-button"
+                  onClick={() => setActiveIconIndex(index)}
                 >
-                  <Icon size={22} />
-                </span>
-                <span className="text">{label}</span>
-              </button>
-            </li>
-          ))}
+                  <span
+                    className={`icon ${activeIconIndex === index ? "icon-active" : ""}`}
+                  >
+                    <Icon size={22} />
+                  </span>
+                  <span className="text">{label}</span>
+                </Link>
+              </li>
+            ))}
 
-          <div className="indicator">
-            <span
-              className={`indicator-icon ${
-                activeIconIndex === scannerIndex ? "icon-active" : ""
-              }`}
-            >
-              <IndicatorIcon size={22} />
-            </span>
-          </div>
-        </ul>
+            <div className="indicator">
+              <span
+                className={`indicator-icon ${
+                  activeIconIndex === scannerIndex ? "icon-active" : ""
+                }`}
+              >
+                <IndicatorIcon size={22} />
+              </span>
+            </div>
+          </ul>
+        </div>
       </div>
-    </>
+    </div>
   );
 }
