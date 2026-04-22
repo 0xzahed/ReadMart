@@ -25,6 +25,7 @@ import { toast } from "sonner";
 import { AdminSidebar } from "@/components/layout/AdminSidebar";
 import { SectionHeading } from "@/components/admin/SectionHeading";
 import { MetricCard } from "@/components/admin/MetricCard";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import {
   Bar,
   BarChart,
@@ -1962,37 +1963,39 @@ export function AdminDashboardPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      
-      <div className="flex min-w-0 flex-1 flex-col">
-        <div className="sticky top-0 z-30 border-b border-gray-200 bg-white/95 backdrop-blur">
-          <div className="mx-auto flex w-full max-w-350 items-center justify-between px-4 py-3 md:px-6">
-            <div className="flex items-center gap-3">
-              <button onClick={() => setSidebarOpen(true)} className="rounded-md p-2 hover:bg-gray-100 lg:hidden">
-                <Menu className="h-5 w-5 text-gray-700" />
-              </button>
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Admin panel</p>
-                <h1 className="text-base font-semibold text-gray-900 md:text-lg">{activeSectionLabel}</h1>
+    <SidebarProvider>
+      <div className="flex w-full min-h-screen bg-gray-50">
+        <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
+        <div className="flex min-w-0 flex-1 flex-col">
+          <div className="sticky top-0 z-30 border-b border-gray-200 bg-white/95 backdrop-blur">
+            <div className="mx-auto flex w-full max-w-350 items-center justify-between px-4 py-3 md:px-6">
+              <div className="flex items-center gap-3">
+                <button onClick={() => setSidebarOpen(true)} className="rounded-md p-2 hover:bg-gray-100 lg:hidden">
+                  <Menu className="h-5 w-5 text-gray-700" />
+                </button>
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Admin panel</p>
+                  <h1 className="text-base font-semibold text-gray-900 md:text-lg">{activeSectionLabel}</h1>
+                </div>
               </div>
+
+              <Link
+                to="/admin"
+                className="rounded-md px-3 py-1.5 text-sm font-medium text-rose-500 transition-colors hover:bg-rose-50"
+              >
+                Logout
+              </Link>
             </div>
-
-            <Link
-              to="/admin"
-              className="rounded-md px-3 py-1.5 text-sm font-medium text-rose-500 transition-colors hover:bg-rose-50"
-            >
-              Logout
-            </Link>
           </div>
-        </div>
 
-        <div className="flex-1 overflow-auto p-4 md:p-6">
-          <div className="mx-auto w-full max-w-350">
-            {renderContent()}
+          <div className="flex-1 overflow-auto p-4 md:p-6">
+            <div className="mx-auto w-full max-w-350">
+              {renderContent()}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 }

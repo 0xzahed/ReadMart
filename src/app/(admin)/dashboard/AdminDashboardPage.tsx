@@ -46,6 +46,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
 const readImageAsDataUrl = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -1426,6 +1427,18 @@ function EntryProductsManagement() {
   return <ProductSelectionManagement title="Entry Products" />;
 }
 
+function PlaceholderManagement({ title, description }: { title: string; description: string }) {
+  return (
+    <div className="space-y-4">
+      <SectionHeading title={title} subtitle={description} />
+      <div className="rounded-xl border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-600 shadow-sm">
+        <p className="font-semibold text-slate-800">This page is connected from sidebar navigation.</p>
+        <p className="mt-2">You can now route to this section directly and add module-specific features here.</p>
+      </div>
+    </div>
+  );
+}
+
 // Main Admin Dashboard with Tabs
 export function AdminDashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -1434,14 +1447,41 @@ export function AdminDashboardPage() {
   const navigate = useNavigate();
   const { logout } = useAdminAuth();
   const { products, orders, categories, promoCodes } = useStore();
-  const pathSegment = location.pathname.split("/")[2] || "";
+  const rawAdminSubPath = location.pathname.replace(/^\/admin\/?/, "");
+  const adminSubPath = rawAdminSubPath.replace(/\/+$/, "");
   const pathTabMap: Record<string, string> = {
+    "": "dashboard",
+    dashboard: "dashboard",
+    banners: "banner-list",
+    "banners/new": "sliders",
+    categories: "categories",
+    "categories/tags": "tag-category",
+    products: "products",
+    "products/new": "entry-products",
+    "products/promotion": "entry-promotion",
+    "flash-deals": "flash-deals",
+    "flash-sale": "flash-sale",
+    coupons: "promo",
     orders: "orders",
+    "orders/trash": "trash-orders",
     customers: "customers",
+    "customers/reviews": "reviews",
+    notifications: "notifications",
+    chat: "chat",
+    campaigns: "campaigns",
+    shipping: "shipping",
+    payments: "payments",
     analytics: "analytics",
     reports: "reports",
+    "reports/sales": "reports",
+    settings: "settings",
+    roles: "roles",
+    "free-delivery": "free-delivery",
+    "free-category-delivery": "free-category-delivery",
+    "youtube-videos": "video-list",
+    videos: "video-list",
   };
-  const activeTab = searchParams.get("tab") || pathTabMap[pathSegment] || "dashboard";
+  const activeTab = searchParams.get("tab") || pathTabMap[adminSubPath] || "dashboard";
 
   const customerCount = new Set(orders.map((order) => order.customerPhone)).size;
   const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
@@ -1500,13 +1540,20 @@ export function AdminDashboardPage() {
     orders: "Orders",
     "trash-orders": "Trash Order List",
     customers: "Customers",
+    reviews: "Reviews",
     "customer-list": "Customer List",
+    notifications: "Notifications",
+    chat: "Chat",
+    campaigns: "Campaigns",
+    shipping: "Shipping Zones",
+    payments: "Payments",
     "free-delivery": "Free Delivery",
     "free-category-delivery": "Free Category Delivery",
     "video-list": "YouTube Video List",
     analytics: "Analytics",
     reports: "Reports",
     settings: "Settings",
+    roles: "Roles & Permissions",
   };
 
   const activeSectionLabel = sectionLabelMap[activeTab] || "Overview";
@@ -1530,13 +1577,20 @@ export function AdminDashboardPage() {
       case "orders": return <OrdersManagement />;
       case "trash-orders": return <TrashOrdersManagement />;
       case "customers": return <CustomersManagement />;
+      case "reviews": return <CustomerListManagement />;
       case "customer-list": return <CustomerListManagement />;
+      case "notifications": return <PlaceholderManagement title="Notifications" description="Send and manage customer notifications from this section." />;
+      case "chat": return <PlaceholderManagement title="Chat" description="Centralized admin chat and support messaging section." />;
+      case "campaigns": return <PlaceholderManagement title="Campaigns" description="Create and monitor marketing campaigns from here." />;
+      case "shipping": return <PlaceholderManagement title="Shipping Zones" description="Configure delivery areas and shipping rules in this module." />;
+      case "payments": return <PlaceholderManagement title="Payments" description="Manage payment methods and payment configuration settings." />;
       case "free-delivery": return <FreeDeliveryManagement />;
       case "free-category-delivery": return <FreeCategoryDeliveryManagement />;
       case "video-list": return <VideoListManagement />;
       case "analytics": return <AnalyticsManagement />;
       case "reports": return <ReportsManagement />;
       case "settings": return <SettingsManagement />;
+      case "roles": return <PlaceholderManagement title="Roles & Permissions" description="Manage role-based access control and admin permissions." />;
       default:
         return (
           <div className="space-y-6">
@@ -1679,42 +1733,44 @@ export function AdminDashboardPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(99,102,241,0.08),transparent_22%),radial-gradient(circle_at_top_right,rgba(56,189,248,0.08),transparent_22%),linear-gradient(180deg,#f8fafc_0%,#eef2ff_100%)]">
-      <AdminSidebar
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-        onLogout={handleLogout}
-      />
-      
-      <div className="flex min-w-0 flex-1 flex-col">
-        <div className="sticky top-0 z-30 border-b border-white/50 bg-white/70 backdrop-blur-xl">
-          <div className="flex w-full items-center justify-between px-3 py-4 md:px-4 lg:px-5">
-            <div className="flex items-center gap-3">
-              <button onClick={() => setSidebarOpen(true)} className="rounded-xl border border-slate-200/70 bg-white/70 p-2.5 shadow-sm transition-colors hover:bg-white lg:hidden">
-                <Menu className="h-5 w-5 text-slate-700" />
-              </button>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Admin panel</p>
-                <h1 className="text-base font-semibold text-slate-900 md:text-lg">{activeSectionLabel}</h1>
+    <SidebarProvider>
+      <div className="flex w-full min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(99,102,241,0.08),transparent_22%),radial-gradient(circle_at_top_right,rgba(56,189,248,0.08),transparent_22%),linear-gradient(180deg,#f8fafc_0%,#eef2ff_100%)]">
+        <AdminSidebar
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          onLogout={handleLogout}
+        />
+
+        <div className="flex min-w-0 flex-1 flex-col">
+          <div className="sticky top-0 z-30 border-b border-white/50 bg-white/70 backdrop-blur-xl">
+            <div className="flex w-full items-center justify-between px-3 py-4 md:px-4 lg:px-5">
+              <div className="flex items-center gap-3">
+                <button onClick={() => setSidebarOpen(true)} className="rounded-xl border border-slate-200/70 bg-white/70 p-2.5 shadow-sm transition-colors hover:bg-white lg:hidden">
+                  <Menu className="h-5 w-5 text-slate-700" />
+                </button>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Admin panel</p>
+                  <h1 className="text-base font-semibold text-slate-900 md:text-lg">{activeSectionLabel}</h1>
+                </div>
               </div>
+
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="rounded-full border border-rose-200 bg-white/80 px-4 py-2 text-sm font-semibold text-rose-500 shadow-sm transition-colors hover:bg-rose-50"
+              >
+                Logout
+              </button>
             </div>
-
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="rounded-full border border-rose-200 bg-white/80 px-4 py-2 text-sm font-semibold text-rose-500 shadow-sm transition-colors hover:bg-rose-50"
-            >
-              Logout
-            </button>
           </div>
-        </div>
 
-        <div className="flex-1 overflow-auto p-3 md:p-4 lg:p-5">
-          <div className="w-full rounded-4xl border border-white/70 bg-white/55 p-3 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur transition-all duration-300 md:p-4">
-            {renderContent()}
+          <div className="flex-1 overflow-auto p-3 md:p-4 lg:p-5">
+            <div className="w-full rounded-4xl border border-white/70 bg-white/55 p-3 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur transition-all duration-300 md:p-4">
+              {renderContent()}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 }

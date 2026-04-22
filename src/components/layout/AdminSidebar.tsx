@@ -1,315 +1,358 @@
 "use client";
 
-import { useState } from "react";
-import { Link, useLocation, useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { NavLink as RouterNavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Package,
   ShoppingCart,
   Users,
-  BarChart3,
   Settings,
-  FileText,
-  Image as ImageIcon,
-  Tags,
+  Tag,
+  Truck,
+  BarChart3,
   Zap,
-  Video,
-  LogOut,
+  Image as ImageIcon,
+  Megaphone,
+  ArrowLeft,
   ChevronDown,
-  ChevronRight,
 } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  useSidebar,
+} from "@/components/ui/sidebar";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { cn } from "@/lib/utils";
 
 interface AdminSidebarProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
   onLogout?: () => void;
 }
 
-interface SubMenuItem {
+type SubItem = { label: string; path: string };
+type NavItem = {
   label: string;
-  tab: string;
-}
+  icon: React.ComponentType<{ className?: string }>;
+  path?: string;
+  children?: SubItem[];
+};
 
-interface MenuGroup {
-  icon: typeof LayoutDashboard;
-  label: string;
-  href: string;
-  tab?: string;
-  children?: SubMenuItem[];
-}
+const navItems: NavItem[] = [
+  { label: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
+  {
+    label: "Sliders",
+    icon: ImageIcon,
+    children: [
+      { label: "Slider List", path: "/admin/banners" },
+      { label: "Add Slider", path: "/admin/banners/new" },
+    ],
+  },
+  {
+    label: "Categories",
+    icon: Tag,
+    children: [
+      { label: "Categories List", path: "/admin/categories" },
+      { label: "Tag Category", path: "/admin/categories/tags" },
+    ],
+  },
+  {
+    label: "Products",
+    icon: Package,
+    children: [
+      { label: "Product List", path: "/admin/products" },
+      { label: "Entry Products", path: "/admin/products/new" },
+      { label: "Entry Promotion", path: "/admin/products/promotion" },
+    ],
+  },
+  {
+    label: "Flash Deals",
+    icon: Zap,
+    children: [
+      { label: "Flash Deals", path: "/admin/flash-deals" },
+      { label: "Flash Sale", path: "/admin/flash-sale" },
+      { label: "Promo Codes", path: "/admin/coupons" },
+    ],
+  },
+  {
+    label: "Orders",
+    icon: ShoppingCart,
+    children: [
+      { label: "Orders", path: "/admin/orders" },
+      { label: "Trash Orders", path: "/admin/orders/trash" },
+    ],
+  },
+  {
+    label: "Customers",
+    icon: Users,
+    children: [
+      { label: "Manage Admins", path: "/admin/manage-admins" },
+      { label: "All Customers", path: "/admin/customers" },
+      { label: "Reviews", path: "/admin/customers/reviews" },
+    ],
+  },
+  {
+    label: "Marketing",
+    icon: Megaphone,
+    children: [
+      { label: "Notifications", path: "/admin/notifications" },
+      { label: "Chat", path: "/admin/chat" },
+      { label: "Campaigns", path: "/admin/campaigns" },
+    ],
+  },
+  {
+    label: "Shipping",
+    icon: Truck,
+    children: [
+      { label: "Shipping Zones", path: "/admin/shipping" },
+      { label: "Payments", path: "/admin/payments" },
+    ],
+  },
+  {
+    label: "Reports",
+    icon: BarChart3,
+    children: [
+      { label: "Analytics", path: "/admin/analytics" },
+      { label: "Sales Report", path: "/admin/reports/sales" },
+    ],
+  },
+  {
+    label: "System",
+    icon: Settings,
+    children: [
+      { label: "Settings", path: "/admin/settings" },
+      { label: "Roles & Permissions", path: "/admin/roles" },
+    ],
+  },
+];
 
-export function AdminSidebar({ isOpen, onClose, onLogout }: AdminSidebarProps) {
-  const [searchParams] = useSearchParams();
-  const location = useLocation();
-  const pathSegment = location.pathname.split("/").filter(Boolean).pop() || "";
-
-  // Prefer query param `tab` (used in AdminDashboardPage).
-  // Fallback to path segment (for pages like `/admin/orders`) so active colors keep working.
-  const activeTab = searchParams.get("tab") || pathSegment || "dashboard";
-
-  // Only auto-expand the active group by default.
-  // If the user explicitly toggles a group, we respect that choice.
-  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
-
-  const toggleMenu = (key: string, currentOpen: boolean) => {
-    // Respect the current visual state so a single click collapses/expands immediately.
-    setOpenMenus((prev) => ({ ...prev, [key]: !currentOpen }));
-  };
-
-  const isActiveTab = (tab: string | undefined): boolean => {
-    if (!tab) return false;
-    return activeTab === tab;
-  };
-
-  const isGroupActive = (children: SubMenuItem[] | undefined): boolean => {
-    if (!children) return false;
-    return children.some((child) => isActiveTab(child.tab));
-  };
-
-  const menuGroups: MenuGroup[] = [
-    { icon: LayoutDashboard, label: "Dashboard", href: "/admin/dashboard", tab: "dashboard" },
-    {
-      icon: ImageIcon,
-      label: "Sliders",
-      href: "/admin/dashboard",
-      children: [
-        { label: "Banner Slides", tab: "sliders" },
-        { label: "Banner List", tab: "banner-list" },
-      ],
-    },
-    {
-      icon: Tags,
-      label: "Categories",
-      href: "/admin/dashboard",
-      children: [
-        { label: "Categories List", tab: "categories" },
-        { label: "Tag Category", tab: "tag-category" },
-      ],
-    },
-    {
-      icon: Package,
-      label: "Products",
-      href: "/admin/dashboard",
-      children: [
-        { label: "Product List", tab: "products" },
-        { label: "Entry Products", tab: "entry-products" },
-        { label: "Entry Promotion", tab: "entry-promotion" },
-      ],
-    },
-    {
-      icon: Zap,
-      label: "Flash Deals",
-      href: "/admin/dashboard",
-      children: [
-        { label: "Flash Deals", tab: "flash-deals" },
-        { label: "Flash Sale", tab: "flash-sale" },
-        { label: "Promo Codes", tab: "promo" },
-      ],
-    },
-    {
-      icon: ShoppingCart,
-      label: "Orders",
-      href: "/admin/dashboard",
-      children: [
-        { label: "Orders", tab: "orders" },
-        { label: "Trash Orders", tab: "trash-orders" },
-      ],
-    },
-    {
-      icon: Users,
-      label: "Customers",
-      href: "/admin/dashboard",
-      children: [
-        { label: "Customers", tab: "customers" },
-        { label: "Customer List", tab: "customer-list" },
-      ],
-    },
-    {
-      icon: Users,
-      label: "Manage Admins",
-      href: "/admin/manage-admins",
-      tab: "manage-admins",
-    },
-    {
-      icon: Tags,
-      label: "Delivery",
-      href: "/admin/dashboard",
-      children: [
-        { label: "Free Delivery", tab: "free-delivery" },
-        { label: "Free Category Delivery", tab: "free-category-delivery" },
-      ],
-    },
-    { icon: Video, label: "YouTube Videos", href: "/admin/dashboard", tab: "video-list" },
-    { icon: BarChart3, label: "Analytics", href: "/admin/dashboard", tab: "analytics" },
-    { icon: FileText, label: "Reports", href: "/admin/dashboard", tab: "reports" },
-    { icon: Settings, label: "Settings", href: "/admin/dashboard", tab: "settings" },
-  ];
-
-  const renderMenuItem = (item: MenuGroup) => {
-    const Icon = item.icon;
-    const hasChildren = item.children && item.children.length > 0;
-    const groupKey = item.label.toLowerCase().replace(/\s+/g, "");
-
-    if (!hasChildren) {
-      // Single menu item without submenu
-      const href = item.tab ? `${item.href}?tab=${item.tab}` : item.href;
-      const active = isActiveTab(item.tab);
-
-      return (
-        <li key={groupKey}>
-          <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.18 }}>
-            <Link
-            to={href}
-            onClick={onClose}
-            className={`relative flex items-center gap-3 rounded-xl border px-3.5 py-3 text-sm font-medium shadow-[0_1px_2px_rgba(15,23,42,0.05)] transition-colors duration-200 transform-gpu focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 ${
-              active
-                ? "border-primary/35 bg-primary/12 text-primary shadow-sm"
-                : "border-slate-200/80 bg-white/75 text-slate-600 hover:border-slate-300 hover:bg-white hover:text-slate-900"
-            }`}
-          >
-            {active && (
-              <motion.span
-                layoutId="admin-active-pill"
-                className="absolute inset-0 rounded-xl border border-primary/40"
-                transition={{ type: "spring", stiffness: 380, damping: 30 }}
-              />
-            )}
-            <Icon className="h-5 w-5 shrink-0" />
-            <span>{item.label}</span>
-            </Link>
-          </motion.div>
-        </li>
-      );
-    }
-
-    // Menu group with submenu
-    const isActive = isGroupActive(item.children);
-    const isExplicitlyToggled = typeof openMenus[groupKey] === "boolean";
-    const isOpen = isExplicitlyToggled ? openMenus[groupKey] : isActive;
-
-    return (
-      <li key={groupKey}>
-        <motion.button
-          onClick={() => toggleMenu(groupKey, isOpen)}
-          whileHover={{ x: 2 }}
-          transition={{ duration: 0.18 }}
-          className={`flex w-full items-center justify-between gap-3 rounded-xl border px-3.5 py-3 text-sm font-medium shadow-[0_1px_2px_rgba(15,23,42,0.05)] transition-colors duration-200 transform-gpu focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 ${
-            isActive
-              ? "border-primary/35 bg-primary/12 text-primary shadow-sm"
-              : "border-slate-200/80 bg-white/75 text-slate-600 hover:border-slate-300 hover:bg-white hover:text-slate-900"
-          }`}
-        >
-          <div className="flex items-center gap-3">
-            <Icon className="h-5 w-5 shrink-0" />
-            <span>{item.label}</span>
-          </div>
-          <motion.span animate={{ rotate: isOpen ? 0 : -90 }} transition={{ duration: 0.2 }}>
-            {isOpen ? (
-              <ChevronDown className="h-4 w-4 shrink-0" />
-            ) : (
-              <ChevronRight className="h-4 w-4 shrink-0" />
-            )}
-          </motion.span>
-        </motion.button>
-
-        <AnimatePresence initial={false}>
-          {isOpen && (
-            <motion.ul
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.22, ease: "easeOut" }}
-              className="ml-6 mt-2 space-y-1.5 overflow-hidden border-l border-slate-200/70 pl-4"
-            >
-              {item.children!.map((child) => {
-                const childActive = isActiveTab(child.tab);
-                return (
-                  <li key={child.tab}>
-                    <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.16 }}>
-                      <Link
-                        to={`${item.href}?tab=${child.tab}`}
-                        onClick={onClose}
-                        className={`flex items-center gap-3 rounded-lg border px-3 py-2 text-sm font-medium transition-colors duration-200 transform-gpu focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25 ${
-                          childActive
-                            ? "border-primary/35 bg-primary/12 text-primary"
-                            : "border-slate-200/70 bg-white/75 text-slate-500 hover:border-slate-300 hover:bg-white hover:text-slate-700"
-                        }`}
-                      >
-                        <span>{child.label}</span>
-                      </Link>
-                    </motion.div>
-                  </li>
-                );
-              })}
-            </motion.ul>
-          )}
-        </AnimatePresence>
-      </li>
-    );
-  };
-
+export function AdminSidebar({ isOpen = false, onClose }: AdminSidebarProps) {
   return (
     <>
-      {/* Overlay for mobile */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-          onClick={onClose}
-        />
-      )}
-
-      {/* Sidebar */}
-      <motion.aside
-        initial={false}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.2 }}
-        className={`fixed left-0 top-0 z-50 flex h-full w-64 flex-col border-r border-slate-200/80 bg-linear-to-b from-white via-slate-50/70 to-slate-100/55 shadow-[0_12px_32px_rgba(15,23,42,0.08)] backdrop-blur-xl transition-transform duration-300 ease-out lg:sticky lg:z-20 lg:translate-x-0 lg:shadow-none ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-      >
-        {/* Logo */}
-        <div className="relative border-b border-slate-200/80 bg-white/70 px-6 py-5 backdrop-blur-xl">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.18),transparent_55%),radial-gradient(circle_at_bottom_right,rgba(56,189,248,0.14),transparent_45%)]" />
-          <div className="relative">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">ReadMart</p>
-            <h1 className="mt-1.5 text-lg font-bold text-slate-900">Admin Dashboard</h1>
-          </div>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto px-4 py-5">
-          <ul className="space-y-2.5">
-            {menuGroups.map((item) => renderMenuItem(item))}
-          </ul>
-        </nav>
-
-        {/* Logout */}
-        <div className="border-t border-slate-200/80 bg-white/70 p-4 backdrop-blur-xl">
-          {onLogout ? (
-            <button
-              type="button"
-              onClick={() => {
-                onLogout();
-                onClose();
-              }}
-              className="flex w-full items-center gap-3 rounded-2xl border border-transparent px-3.5 py-2.5 text-sm font-semibold text-slate-600 transition-colors duration-200 transform-gpu hover:border-slate-200/80 hover:bg-white/85 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25"
-            >
-              <LogOut className="w-5 h-5" />
-              <span>Logout</span>
-            </button>
-          ) : (
-            <Link
-              to="/admin"
-              onClick={onClose}
-              className="flex w-full items-center gap-3 rounded-2xl border border-transparent px-3.5 py-2.5 text-sm font-semibold text-slate-600 transition-colors duration-200 transform-gpu hover:border-slate-200/80 hover:bg-white/85 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25"
-            >
-              <LogOut className="w-5 h-5" />
-              <span>Logout</span>
-            </Link>
-          )}
-        </div>
-      </motion.aside>
+      <SidebarMobileStateSync isOpen={isOpen} onClose={onClose} />
+      <AdminSidebarContent onClose={onClose} />
     </>
+  );
+}
+
+function SidebarMobileStateSync({ isOpen, onClose }: { isOpen: boolean; onClose?: () => void }) {
+  const { isMobile, openMobile, setOpenMobile } = useSidebar();
+
+  useEffect(() => {
+    if (!isMobile) return;
+    if (openMobile !== isOpen) {
+      setOpenMobile(isOpen);
+    }
+  }, [isMobile, openMobile, setOpenMobile, isOpen]);
+
+  useEffect(() => {
+    if (!isMobile || openMobile) return;
+    onClose?.();
+  }, [isMobile, openMobile, onClose]);
+
+  return null;
+}
+
+function AdminSidebarContent({ onClose }: { onClose?: () => void }) {
+  const location = useLocation();
+  const collapsed = false;
+
+  const closeMobileSidebar = () => {
+    onClose?.();
+  };
+
+  const isActive = (path: string) => location.pathname === path;
+  const isGroupActive = (item: NavItem) =>
+    item.children?.some((child) => isActive(child.path)) ?? false;
+
+  return (
+    <Sidebar collapsible="none" className="border-r border-sidebar-border">
+      <SidebarHeader className="border-b border-sidebar-border bg-sidebar px-4 py-4">
+        {!collapsed ? (
+          <div className="flex flex-col">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              ShopHub
+            </span>
+            <h1 className="mt-0.5 text-lg font-bold text-foreground">
+              Admin Dashboard
+            </h1>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center">
+            <span className="text-base font-bold text-primary">S</span>
+          </div>
+        )}
+      </SidebarHeader>
+
+      <SidebarContent className="bg-sidebar px-3 py-3">
+        <nav className="flex flex-col gap-1.5">
+          {navItems.map((item) => {
+            if (!item.children) {
+              return (
+                <TopLink
+                  key={item.label}
+                  item={item}
+                  active={item.path ? isActive(item.path) : false}
+                  collapsed={collapsed}
+                  onNavigate={closeMobileSidebar}
+                />
+              );
+            }
+
+            return (
+              <CollapsibleItem
+                key={item.label}
+                item={item}
+                defaultOpen={isGroupActive(item)}
+                isActive={isActive}
+                collapsed={collapsed}
+                onNavigate={closeMobileSidebar}
+              />
+            );
+          })}
+        </nav>
+      </SidebarContent>
+
+      <SidebarFooter className="border-t border-sidebar-border bg-sidebar p-3">
+        <RouterNavLink
+          to="/"
+          onClick={closeMobileSidebar}
+          className={cn(
+            "flex items-center gap-3 rounded-full border border-sidebar-border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary",
+            collapsed && "justify-center px-0"
+          )}
+        >
+          <ArrowLeft className="h-4 w-4 shrink-0" />
+          {!collapsed && <span>Back to Store</span>}
+        </RouterNavLink>
+      </SidebarFooter>
+    </Sidebar>
+  );
+}
+
+function TopLink({
+  item,
+  active,
+  collapsed,
+  onNavigate,
+}: {
+  item: NavItem;
+  active: boolean;
+  collapsed: boolean;
+  onNavigate: () => void;
+}) {
+  return (
+    <RouterNavLink
+      to={item.path!}
+      end
+      onClick={onNavigate}
+      className={cn(
+        "group flex items-center gap-3 rounded-full border px-4 py-2.5 text-sm font-medium transition-all",
+        active
+          ? "border-primary/20 bg-primary/10 text-primary shadow-sm"
+          : "border-sidebar-border bg-background text-foreground hover:border-primary/20 hover:bg-primary/5 hover:text-primary",
+        collapsed && "justify-center px-0"
+      )}
+      title={collapsed ? item.label : undefined}
+    >
+      <item.icon className="h-4 w-4 shrink-0" />
+      {!collapsed && <span className="flex-1 truncate">{item.label}</span>}
+    </RouterNavLink>
+  );
+}
+
+function CollapsibleItem({
+  item,
+  defaultOpen,
+  isActive,
+  collapsed,
+  onNavigate,
+}: {
+  item: NavItem;
+  defaultOpen: boolean;
+  isActive: (path: string) => boolean;
+  collapsed: boolean;
+  onNavigate: () => void;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+
+  useEffect(() => {
+    if (defaultOpen) {
+      setOpen(true);
+    }
+  }, [defaultOpen]);
+
+  const groupActive = item.children?.some((child) => isActive(child.path)) ?? false;
+
+  if (collapsed) {
+    return (
+      <RouterNavLink
+        to={item.children![0].path}
+        onClick={onNavigate}
+        className={cn(
+          "flex items-center justify-center rounded-full border px-0 py-2.5 text-sm transition-colors",
+          groupActive
+            ? "border-primary/20 bg-primary/10 text-primary"
+            : "border-sidebar-border bg-background text-foreground hover:bg-primary/5 hover:text-primary"
+        )}
+        title={item.label}
+      >
+        <item.icon className="h-4 w-4" />
+      </RouterNavLink>
+    );
+  }
+
+  return (
+    <Collapsible open={open} onOpenChange={setOpen}>
+      <CollapsibleTrigger asChild>
+        <button
+          type="button"
+          className={cn(
+            "group flex w-full items-center gap-3 rounded-full border px-4 py-2.5 text-sm font-medium transition-all",
+            groupActive
+              ? "border-primary/20 bg-primary/10 text-primary shadow-sm"
+              : "border-sidebar-border bg-background text-foreground hover:border-primary/20 hover:bg-primary/5 hover:text-primary"
+          )}
+        >
+          <item.icon className="h-4 w-4 shrink-0" />
+          <span className="flex-1 truncate text-left">{item.label}</span>
+          <ChevronDown
+            className={cn(
+              "h-4 w-4 shrink-0 transition-transform duration-200",
+              open ? "rotate-180" : "rotate-0"
+            )}
+          />
+        </button>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+        <div className="mt-1.5 flex flex-col gap-1 pl-4">
+          {item.children!.map((child) => {
+            const active = isActive(child.path);
+            return (
+              <RouterNavLink
+                key={child.path}
+                to={child.path}
+                onClick={onNavigate}
+                className={cn(
+                  "rounded-full border px-4 py-2 text-sm font-medium transition-colors",
+                  active
+                    ? "border-primary/20 bg-primary/10 text-primary"
+                    : "border-sidebar-border bg-background text-muted-foreground hover:bg-primary/5 hover:text-primary"
+                )}
+              >
+                {child.label}
+              </RouterNavLink>
+            );
+          })}
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
   );
 }
